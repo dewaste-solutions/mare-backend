@@ -1,13 +1,10 @@
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 
+import { ENV } from "./config/env";
 import { logger } from "./middleware";
 
-dotenv.config();
-
 const app = express();
-const PORT = 5000;
 
 // Middleware
 app.use(cors());
@@ -20,6 +17,6 @@ app.get("/", (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(ENV.PORT, () => {
+  console.log(`Server running on http://localhost:${ENV.PORT}`);
 });
