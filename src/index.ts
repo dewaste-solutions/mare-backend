@@ -7,7 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config";
 import env from "./env";
 import { error, logger, notFound } from "./middleware";
-import { userRoutes } from "./routes";
+import { sampleRoutes } from "./routes";
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.get("/api/", (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
-app.use("/api/sample", userRoutes);
+app.use("/api/sample", sampleRoutes);
 
 // API documentation
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
