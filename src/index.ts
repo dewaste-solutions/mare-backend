@@ -1,8 +1,13 @@
+import type { Request, Response } from "express";
+
 import cors from "cors";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 
+import { swaggerSpec } from "./config";
 import env from "./env";
 import { error, logger, notFound } from "./middleware";
+import { userRoutes } from "./routes";
 
 const app = express();
 
@@ -11,13 +16,20 @@ app.use(cors());
 app.use(express.json());
 app.use(logger());
 
-// Basic Route
-app.get("/", (req, res) => {
-  res.send("Express + TypeScript Server is running!");
+// API Routes
+app.get("/api/", (req: Request, res: Response) => {
+  res.json({
+    name: "Test API",
+    version: "1.0.0",
+    status: "running",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
-app.get("/error", (req, res, next) => {
-  next(new Error("Something went wrong!"));
-});
+app.use("/api/sample", userRoutes);
+
+// API documentation
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(notFound());
 app.use(error());
