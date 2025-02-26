@@ -13,7 +13,7 @@ expand(config({
 
 const EnvSchema = z.object({
   NODE_ENV: z.string().default("development"),
-  PORT: z.coerce.number().default(9999),
+  PORT: z.coerce.number().default(5000),
 });
 
 export type env = z.infer<typeof EnvSchema>;
