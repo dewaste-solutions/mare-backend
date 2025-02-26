@@ -1,18 +1,12 @@
-import type { NextFunction, Request, Response } from "express";
+import morgan from "morgan";
 
-interface CustomRequest extends Request {
-  timestamp?: string;
-}
+const logFormat = ":date[iso] :method :url :status :response-time ms";
 
 export function logger() {
-  return (req: CustomRequest, res: Response, next: NextFunction) => {
-    req.timestamp = new Date().toISOString();
-    const userAgent = req.get("User-Agent") || "Unknown User-Agent";
-
-    console.log(
-      `${req.timestamp} ${req.method} ${req.ip} ${req.originalUrl} - ${userAgent}`,
-    );
-
-    next();
-  };
+  return morgan(logFormat, {
+    stream: {
+      write: (message: string) => console.log(message.trim()),
+    },
+    skip: (req, res) => res.statusCode >= 400,
+  });
 }

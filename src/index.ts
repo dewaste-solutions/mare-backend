@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import { ENV } from "./config/env";
-import { logger } from "./middleware";
+import { error, logger, notFound } from "./middleware";
 
 const app = express();
 
@@ -15,6 +15,12 @@ app.use(logger());
 app.get("/", (req, res) => {
   res.send("Express + TypeScript Server is running!");
 });
+app.get("/error", (req, res, next) => {
+  next(new Error("Something went wrong!"));
+});
+
+app.use(notFound());
+app.use(error());
 
 // Start Server
 app.listen(ENV.PORT, () => {
