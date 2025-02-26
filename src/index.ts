@@ -1,7 +1,7 @@
 import cors from "cors";
 import express from "express";
 
-import { ENV } from "./config/env";
+import env from "./env";
 import { error, logger, notFound } from "./middleware";
 
 const app = express();
@@ -23,6 +23,7 @@ app.use(notFound());
 app.use(error());
 
 // Start Server
-app.listen(ENV.PORT, () => {
-  console.log(`Server running on http://localhost:${ENV.PORT}`);
+app.listen(env.PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Server running on http://localhost:${env.PORT}`);
 });

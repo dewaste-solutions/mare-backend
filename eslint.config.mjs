@@ -12,10 +12,10 @@ export default antfu({
   ignores: ["**/migrations/*", "**/*.yml"],
 }, {
   rules: {
-    "no-console": ["warn"],
+    "no-console": ["error"],
     "antfu/no-top-level-await": ["off"],
     "node/prefer-global/process": ["off"],
-    "node/no-process-env": ["warn"],
+    "node/no-process-env": ["error"],
     "perfectionist/sort-imports": ["error", {
       tsconfigRootDir: ".",
     }],
