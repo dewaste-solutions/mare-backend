@@ -1,6 +1,11 @@
 import express from "express";
 
-import { createSample, deleteSample, getSample, getSampleById } from "../controller";
+import {
+  createSample,
+  deleteSample,
+  getSample,
+  getSampleById,
+} from "../controller";
 import { validateSample, validateSampleId } from "../helper";
 
 export const sampleRoutes = express.Router();

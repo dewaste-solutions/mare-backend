@@ -8,7 +8,11 @@ const sampleSchema = z
   })
   .strict();
 
-export function validateSample(req: Request, res: Response, next: NextFunction): void {
+export function validateSample(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const result = sampleSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -21,11 +25,18 @@ export function validateSample(req: Request, res: Response, next: NextFunction):
 
 const sampleIdSchema = z
   .object({
-    id: z.coerce.number().int().positive("Sample ID must be a positive integer"),
+    id: z.coerce
+      .number()
+      .int()
+      .positive("Sample ID must be a positive integer"),
   })
   .strict();
 
-export function validateSampleId(req: Request, res: Response, next: NextFunction): void {
+export function validateSampleId(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   const result = sampleIdSchema.safeParse(req.params);
 
   if (!result.success) {

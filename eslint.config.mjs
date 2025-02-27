@@ -1,27 +1,16 @@
-import antfu from "@antfu/eslint-config";
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import tseslint from "typescript-eslint";
 
-export default antfu({
-  type: "app",
-  typescript: true,
-  formatters: true,
-  stylistic: {
-    indent: 2,
-    semi: true,
-    quotes: "double",
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  { files: ["**/*.{js,mjs,cjs,ts}"] },
+  { languageOptions: { globals: globals.browser } },
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      "no-console": ["error"],
+    },
   },
-  ignores: ["**/migrations/*", "**/*.yml"],
-}, {
-  rules: {
-    "no-console": ["error"],
-    "antfu/no-top-level-await": ["off"],
-    "node/prefer-global/process": ["off"],
-    "node/no-process-env": ["error"],
-    "perfectionist/sort-imports": ["error", {
-      tsconfigRootDir: ".",
-    }],
-    "unicorn/filename-case": ["error", {
-      case: "kebabCase",
-      ignore: ["README.md"],
-    }],
-  },
-});
+];

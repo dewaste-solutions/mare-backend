@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import type { NextFunction, Request, Response } from "express";
 
 import morgan from "morgan";
