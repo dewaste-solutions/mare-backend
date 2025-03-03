@@ -151,7 +151,7 @@ export const revokeRefreshToken = async (req: Request, res: Response) => {
         const token = req.cookies.refreshToken
 
         if (!token) {
-            res.status(401).json({ success: false, message: "Missing refresh token" });
+            res.status(401).json({ message: "Unauthorized" });
             return 
         }
 
@@ -161,15 +161,15 @@ export const revokeRefreshToken = async (req: Request, res: Response) => {
             .where(eq(refreshTokens.token, token));
 
         if (result.rowCount === 0) {
-            res.status(404).json({ success: false, message: "Refresh token not found or already revoked" });
+            res.status(404).json({ message: "Not Found" });
             return 
         }
 
         res.clearCookie("refreshToken");
-        res.status(200).json({ success: true, message: "User signed out successfully" });
+        res.status(200).json({ message: "Signed out" });
         return
     } catch (_) {
-        res.status(500).json({ success: false, message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
         return
     }
 };
