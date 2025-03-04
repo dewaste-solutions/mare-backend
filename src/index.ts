@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 
 import { authRoutes } from "./routes/auth-route";
 import env from "./env";
+import {  applyRateLimit, RateLimitCategory } from "./middleware";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ app.get("/api", (req, res) => {
   res.send("Express + TypeScript Server is running!");
 });
 
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes)
 
 // Start Server
 app.listen(PORT, () => {
