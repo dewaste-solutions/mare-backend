@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from "../db";
 import { users, sessions, refreshTokens } from "../db/schema";
+import env from "../env";
 
 export function getExpiryTime(type: "day" | "week"): Date {
     const now = new Date();
@@ -73,7 +74,7 @@ export async function signInUser(req: Request, res: Response) {
             return
         }
 
-        const privateKey = process.env.BACKEND_AUTH_PRIVATE_KEY!
+        const privateKey = env.BACKEND_AUTH_PRIVATE_KEY!
         let refreshToken: string | null = null;
 
         try {

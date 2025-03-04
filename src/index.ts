@@ -4,11 +4,12 @@ import cors from "cors";
 import cookieParser from 'cookie-parser'
 
 import { authRoutes } from "./routes/auth-route";
+import env from "./env";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.BACKEND_PORT || 5000;
+const PORT = env.BACKEND_PORT || 5000;
 
 // Middleware
 app.use(cors());
