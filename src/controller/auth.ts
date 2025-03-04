@@ -79,6 +79,22 @@ export async function signInUser(req: Request, res: Response) {
         .where(eq(users.email, email))
         .limit(1);
         if (existingUser.length === 0) {
+            const FAKE_BCRYPT_HASH = "$2b$10$gJfPmz8qEJeyMYzhr7oxYekT0YhFh2D2WpHGjNY8zGZk2JzrsGqY2";
+            
+            // Fake password comparison to prevent timing attacks.
+            // - Even if the email doesn't exist, we always run bcrypt.compare().
+            // - This ensures the response time remains consistent for valid and invalid users.
+            // - Prevents attackers from detecting valid emails based on response times.
+            // - you can calculate the ms by using perf_hooks lib
+            //   - const time = performance.now();
+            await bcrypt.hash(FAKE_BCRYPT_HASH, 10);
+
+            res.status(401).json({ message: "Invalid input" });
+            return
+        }
+
+        const passwordResult = await bcrypt.compare(password, existingUser[0].encryptedPassword);
+        if (!passwordResult) {
             res.status(401).json({ message: "Invalid input" });
             return
         }
@@ -92,12 +108,6 @@ export async function signInUser(req: Request, res: Response) {
 
         if (permissionList.length === 0) {
             res.status(500).json({ message: "Internal server error" });
-            return
-        }
-
-        const passwordResult = await bcrypt.compare(password, existingUser[0].encryptedPassword);
-        if (!passwordResult) {
-            res.status(401).json({ message: "Invalid input" });
             return
         }
 
