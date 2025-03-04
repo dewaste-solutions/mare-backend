@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { eq } from 'drizzle-orm';
 
 import { db } from "../db";
-import { users, sessions, refreshTokens } from "../db/schema";
+import { users, sessions, refreshTokens, roles, permissions, rolePermissions } from "../db/schema";
 import env from "../env";
 
 export function getExpiryTime(type: "day" | "week"): Date {
@@ -40,6 +40,7 @@ export async function createUser(req: Request, res: Response) {
                 email,
                 updatedAt: new Date(),
                 encryptedPassword: hashedPassword,
+                roleId: "10000000-0000-0000-0000-000000000003"
             }
         ).returning({ id: users.id, email: users.email, first_name: users.firstName, last_name: users.lastName, role_id: users.roleId })
         if (newUser.length === 0) {
@@ -50,7 +51,6 @@ export async function createUser(req: Request, res: Response) {
         res.status(201).json({ message: "User created successfully" });
         return
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: "Internal server error" });
         return
     }
@@ -62,9 +62,36 @@ export async function signInUser(req: Request, res: Response) {
         const ipAddress = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").toString();
         const userAgent = req.headers["user-agent"] || "unknown";
 
-        const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1)
+        const existingUser = await db
+        .select(
+            {
+                id: users.id,
+                firstName: users.firstName,
+                lastName: users.lastName,
+                email: users.email,
+                encryptedPassword: users.encryptedPassword,
+                role: roles.name,
+                roleId: users.roleId
+            }
+        )
+        .from(users)
+        .leftJoin(roles, eq(users.roleId, roles.id))
+        .where(eq(users.email, email))
+        .limit(1);
         if (existingUser.length === 0) {
             res.status(401).json({ message: "Invalid input" });
+            return
+        }
+
+        const permissionList = await db
+        .select({scope: permissions.scope }) 
+        .from(rolePermissions)
+        .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+        .where(eq(rolePermissions.roleId, existingUser[0].roleId))
+        const permissionsArray = permissionList.map((p) => p.scope);
+
+        if (permissionList.length === 0) {
+            res.status(500).json({ message: "Internal server error" });
             return
         }
 
@@ -78,13 +105,14 @@ export async function signInUser(req: Request, res: Response) {
         let refreshToken: string | null = null;
 
         try {
-            await db.transaction(async (tx) => {    
+            await db.transaction(async (tx) => {
                 const newSession = await tx.insert(sessions).values({
                     userId: existingUser[0].id,
                     updatedAt: new Date(),
                     notAfter: getExpiryTime('week'),
                     ipAddress,
-                    userAgent
+                    userAgent,
+                    refreshAt: new Date(),
                 }).returning({ id: sessions.id });
                 if (newSession.length === 0) {
                     res.status(500).json({ message: "Internal server error" });
@@ -97,11 +125,11 @@ export async function signInUser(req: Request, res: Response) {
                         firstName: existingUser[0].firstName,
                         lastName: existingUser[0].lastName,
                         id: newSession[0].id
-                
-                    }, 
-                    privateKey, 
-                    { 
-                        expiresIn: '1d' 
+
+                    },
+                    privateKey,
+                    {
+                        expiresIn: '1d'
                     }
                 );
 
@@ -117,7 +145,7 @@ export async function signInUser(req: Request, res: Response) {
                     return
                 }
             })
-    
+
         } catch (error) {
             res.status(500).json({ message: "Internal server error" })
             return
@@ -128,6 +156,8 @@ export async function signInUser(req: Request, res: Response) {
                 email: existingUser[0].email,
                 firstName: existingUser[0].firstName,
                 lastName: existingUser[0].lastName,
+                role: existingUser[0].role,
+                "permission": permissionsArray
             },
             privateKey,
             { expiresIn: "5m", algorithm: "HS256", }
@@ -153,7 +183,7 @@ export const revokeRefreshToken = async (req: Request, res: Response) => {
 
         if (!token) {
             res.status(401).json({ message: "Unauthorized" });
-            return 
+            return
         }
 
         const result = await db
@@ -163,7 +193,7 @@ export const revokeRefreshToken = async (req: Request, res: Response) => {
 
         if (result.rowCount === 0) {
             res.status(404).json({ message: "Not Found" });
-            return 
+            return
         }
 
         res.clearCookie("refreshToken");

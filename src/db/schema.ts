@@ -14,7 +14,7 @@ export const users = authSchema.table("users", {
     recoveryToken: text('recovery_token'),
     recoverySentAt: timestamp('recovery_sent_at'),
 
-    roleId: uuid("role_id").references(() => roles.id, { onDelete: "set null" }),
+    roleId: uuid("role_id").notNull().references(() => roles.id, { onDelete: "set null" }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull(),
 });
@@ -34,7 +34,7 @@ export const sessions = authSchema.table("sessions", {
     // If not_after is reached, the session expires.
     notAfter: timestamp('not_after').notNull(),
     // If a refresh token is used, refresh_at is updated.
-    refreshAt: timestamp("refresh_at"),
+    refreshAt: timestamp("refresh_at").notNull(),
     ipAddress: text('ip_address').notNull(),
     userAgent: text('user_agent').notNull(),
 
