@@ -79,7 +79,7 @@ export async function signInUser(req: Request, res: Response) {
         .where(eq(users.email, email))
         .limit(1);
         if (existingUser.length === 0) {
-            const FAKE_BCRYPT_HASH = "$2b$10$gJfPmz8qEJeyMYzhr7oxYekT0YhFh2D2WpHGjNY8zGZk2JzrsGqY2";
+            const FAKE_BCRYPT_HASH = "$2b$10$gJfPmz8qEJeyMYzhr7oxYekT0YhFh2D2WpHGjNY8zGZk2JzrsGqY2GH";
             
             // Fake password comparison to prevent timing attacks.
             // - Even if the email doesn't exist, we always run bcrypt.compare().
