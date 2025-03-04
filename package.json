@@ -12,7 +12,8 @@
     "db:pull": "npx drizzle-kit pull",
     "db:studio": "npx drizzle-kit studio",
     "db:check": "npx drizzle-kit check",
-    "db:up": "npx drizzle-kit up"
+    "db:up": "npx drizzle-kit up",
+    "seed": "ts-node src/seeds/seed.ts"
   },
   "keywords": [],
   "author": "",
