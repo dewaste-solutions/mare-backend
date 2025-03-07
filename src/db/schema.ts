@@ -19,6 +19,13 @@ export const users = authSchema.table("users", {
     updatedAt: timestamp('updated_at').notNull(),
 });
 
+export const hello = authSchema.table("hello", {
+    id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+    hello: text('hello').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull(),
+});
+
 export const profiles = authSchema.table("profiles", {
     id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
     phoneNumber: text('phone_number'),
