@@ -13,6 +13,7 @@ import {
 	users,
 } from "../db/schema";
 import env from "../env";
+import { decryptToken } from "../helper/validate-access-token";
 
 export function getExpiryTime(type: "day" | "week"): Date {
 	const now = new Date();
@@ -238,6 +239,59 @@ export const revokeRefreshToken = async (req: Request, res: Response) => {
 		res.status(200).json({ message: "Signed out" });
 		return;
 	} catch (_) {
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+export const getProfile = async (
+	req: Request,
+	res: Response,
+): Promise<void> => {
+	try {
+		const authHeader = req.headers.authorization;
+		if (!authHeader?.startsWith("Bearer ")) {
+			res.status(401).json({ message: "Unauthorized" });
+			return;
+		}
+
+		const accessToken = authHeader.split(" ")[1];
+
+		const decodedUser = await decryptToken(accessToken);
+		if (!decodedUser) {
+			res.status(401).json({ message: "Invalid token" });
+			return;
+		}
+
+		// type UserProfile = {
+		// 	id: string;
+		// 	firstName: string;
+		// 	lastName: string;
+		// 	email: string;
+		// 	role: string | null;
+		// };
+
+		// const user: UserProfile[] = await db
+		// 	.select({
+		// 		id: users.id,
+		// 		firstName: users.firstName,
+		// 		lastName: users.lastName,
+		// 		email: users.email,
+		// 		role: roles.name,
+		// 	})
+		// 	.from(users)
+		// 	.leftJoin(roles, eq(users.roleId, roles.id))
+		// 	.where(eq(users.email, decoded.email))
+		// 	.limit(1);
+
+		// if (user.length === 0) {
+		// 	return res.status(404).json({ message: "User not found" });
+		// }
+
+		// Send user details
+		res.status(200).json({}); // user[0]
+		return;
+	} catch (error) {
 		res.status(500).json({ message: "Internal server error" });
 		return;
 	}
