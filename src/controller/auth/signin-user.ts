@@ -69,12 +69,13 @@ export async function signInUser(req: Request, res: Response) {
 			.from(rolePermissions)
 			.innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
 			.where(eq(rolePermissions.roleId, existingUser[0].roleId));
-		const permissionsArray = permissionList.map((p) => p.scope);
+			
 		// if the permission list is empty then return internal server error
 		if (permissionList.length === 0) {
 			res.status(500).json({ message: "Internal server error" });
 			return;
 		}
+		const permissionsArray = permissionList.map((p) => p.scope);
 
 		const privateKey = env.BACKEND_AUTH_PRIVATE_KEY;
 		let refreshToken: string | null = null;
