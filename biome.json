@@ -22,6 +22,13 @@
 			"recommended": true,
 			"style": {
 				"useFilenamingConvention": "error"
+			},
+			"correctness": {
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error"
+			},
+			"suspicious": {
+				"noConsole": "error"
 			}
 		}
 	},

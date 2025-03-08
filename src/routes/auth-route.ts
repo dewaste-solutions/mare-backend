@@ -1,11 +1,7 @@
 import express from "express";
 
-import { createUser, revokeRefreshToken, signInUser } from "../controller";
-import {
-	authenticateToken,
-	validateAuthSignIn,
-	validateAuthSignup,
-} from "../middleware";
+import { createUser, getProfile, signInUser, signoutUser } from "../controller";
+import { validateAuthSignIn, validateAuthSignup } from "../middleware";
 
 export const authRoutes = express.Router();
 
@@ -13,8 +9,6 @@ authRoutes.post("/signup", validateAuthSignup, createUser);
 
 authRoutes.post("/signin", validateAuthSignIn, signInUser);
 
-authRoutes.post("/signout", revokeRefreshToken);
+authRoutes.post("/signout", signoutUser);
 
-authRoutes.get("/protected", authenticateToken, (_, res) => {
-	res.json({ message: "Welcome admin" });
-});
+authRoutes.post("/profile", getProfile);

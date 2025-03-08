@@ -3,8 +3,10 @@ import { permissions, rolePermissions, roles } from "../db/schema";
 
 (async function seed() {
 	try {
+		// biome-ignore lint/suspicious/noConsole:
 		console.log("Seeding database...");
 
+		// biome-ignore lint/suspicious/noConsole:
 		console.log("seeding roles");
 		await db.insert(roles).values([
 			{
@@ -24,6 +26,7 @@ import { permissions, rolePermissions, roles } from "../db/schema";
 			},
 		]);
 
+		// biome-ignore lint/suspicious/noConsole:
 		console.log("seeding permission");
 		await db.insert(permissions).values([
 			{
@@ -52,6 +55,7 @@ import { permissions, rolePermissions, roles } from "../db/schema";
 			},
 		]);
 
+		// biome-ignore lint/suspicious/noConsole:
 		console.log("seeding role permission");
 		await db.insert(rolePermissions).values([
 			{
@@ -80,8 +84,10 @@ import { permissions, rolePermissions, roles } from "../db/schema";
 			},
 		]);
 
+		// biome-ignore lint/suspicious/noConsole:
 		console.log("Seed data inserted successfully!");
 	} catch (error) {
+		// biome-ignore lint/suspicious/noConsole:
 		console.error(error);
 	}
 })();

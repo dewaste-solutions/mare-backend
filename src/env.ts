@@ -24,7 +24,9 @@ export type env = z.infer<typeof EnvSchema>;
 const { data: env, error } = EnvSchema.safeParse(process.env);
 
 if (error) {
+	// biome-ignore lint/suspicious/noConsole:
 	console.error("❌ Invalid env:");
+	// biome-ignore lint/suspicious/noConsole:
 	console.error(JSON.stringify(error.flatten().fieldErrors, null, 2));
 	process.exit(1);
 }
