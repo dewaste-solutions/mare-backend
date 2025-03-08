@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
-import { users } from "../../db/schema";
+import { users } from "../../db/schema/auth";
 
 // this function will change after invitation signup with token is implemented
 export async function createUser(req: Request, res: Response) {

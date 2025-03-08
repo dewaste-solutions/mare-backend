@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
-import { refreshTokens, sessions } from "../../db/schema";
+import { refreshTokens, sessions } from "../../db/schema/auth";
 import { decryptToken } from "../../helper/auth/validate-token";
 
 export const signoutUser = async (req: Request, res: Response) => {
@@ -34,7 +34,7 @@ export const signoutUser = async (req: Request, res: Response) => {
 			.limit(1);
 
 		// Check if token is present
-		if (!tokenRecord.length) {
+		if (tokenRecord.length === 0) {
 			res.status(404).json({ message: "Token not found" });
 			return;
 		}

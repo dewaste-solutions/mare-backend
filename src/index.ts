@@ -2,8 +2,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 
-import env from "./env";
-import { RateLimitCategory, applyRateLimit } from "./middleware";
+import { env } from "./env";
+import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { authRoutes } from "./routes/auth-route";
 
 const app = express();

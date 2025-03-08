@@ -1,7 +1,12 @@
 import express from "express";
-
-import { createUser, getProfile, signInUser, signoutUser } from "../controller";
-import { validateAuthSignIn, validateAuthSignup } from "../middleware";
+import { createUser } from "../controller/auth/create-user";
+import { getProfile } from "../controller/auth/get-profile";
+import { signInUser } from "../controller/auth/signin-user";
+import { signoutUser } from "../controller/auth/signout-user";
+import {
+	validateAuthSignIn,
+	validateAuthSignup,
+} from "../middleware/auth/validate-body";
 
 export const authRoutes = express.Router();
 

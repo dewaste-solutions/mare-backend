@@ -11,8 +11,8 @@ import {
 	roles,
 	sessions,
 	users,
-} from "../../db/schema";
-import env from "../../env";
+} from "../../db/schema/auth";
+import { env } from "../../env";
 
 export async function signInUser(req: Request, res: Response) {
 	try {
@@ -43,6 +43,7 @@ export async function signInUser(req: Request, res: Response) {
 		// Prevent timing attacks
 		if (existingUser.length === 0) {
 			await bcrypt.hash(
+				// biome-ignore lint/nursery/noSecrets: <explanation>
 				"$2b$10$gJfPmz8qEJeyMYzhr7oxYekT0YhFh2D2WpHGjNY8zGZk2JzrsGqY2GH",
 				10,
 			);

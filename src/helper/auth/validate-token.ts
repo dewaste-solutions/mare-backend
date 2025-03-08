@@ -2,8 +2,8 @@ import { fromUnixTime, getUnixTime } from "date-fns";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
-import { refreshTokens, sessions } from "../../db/schema";
-import env from "../../env";
+import { refreshTokens, sessions } from "../../db/schema/auth";
+import { env } from "../../env";
 
 export const decryptToken = async (token: string) => {
 	try {

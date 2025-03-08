@@ -20,18 +20,17 @@ const EnvSchema = z.object({
 	BACKEND_AUTH_PRIVATE_KEY: z.string(),
 });
 
-export type env = z.infer<typeof EnvSchema>;
+export type Env = z.infer<typeof EnvSchema>;
 
 // biome-ignore lint/nursery/noProcessEnv: <explanation>
-const { data: env, error } = EnvSchema.safeParse(process.env);
+const parsedEnv = EnvSchema.safeParse(process.env);
 
-if (error) {
+if (!parsedEnv.success) {
 	// biome-ignore lint/suspicious/noConsole:
 	console.error("❌ Invalid env:");
 	// biome-ignore lint/suspicious/noConsole:
-	console.error(JSON.stringify(error.flatten().fieldErrors, null, 2));
+	console.error(JSON.stringify(parsedEnv.error.flatten().fieldErrors, null, 2));
 	process.exit(1);
 }
 
-// biome-ignore lint/style/noNonNullAssertion: Needed for safe env export
-export default env!;
+export const env: Env = parsedEnv.data;

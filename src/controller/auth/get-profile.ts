@@ -1,8 +1,11 @@
 import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
-import { refreshTokens, sessions, users } from "../../db/schema";
-import { isAccessTokenValidated, isRefreshTokenValidated } from "../../helper";
+import { refreshTokens, sessions, users } from "../../db/schema/auth";
+import {
+	isAccessTokenValidated,
+	isRefreshTokenValidated,
+} from "../../helper/auth/validate-token";
 
 export const getProfile = async (
 	req: Request,
@@ -37,7 +40,7 @@ export const getProfile = async (
 			.where(eq(refreshTokens.token, refreshTokenCookies))
 			.limit(1);
 
-		if (!record.length) {
+		if (record.length === 0) {
 			res.status(401).json({ message: "Unauthorized" });
 			return;
 		}
@@ -78,7 +81,7 @@ export const getProfile = async (
 			.where(eq(users.id, userId))
 			.limit(1);
 
-		if (!userProfile.length) {
+		if (userProfile.length === 0) {
 			res.status(404).json({ message: "User not found" });
 			return;
 		}

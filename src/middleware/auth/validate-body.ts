@@ -1,6 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 
+const lowercaseRegex = /[a-z]/;
+const uppercaseRegex = /[A-Z]/;
+const numberRegex = /\d/;
+const specialCharRegex = /[!@#$%^&*]/;
+
 export const authSignupSchema = z.object({
 	email: z.string().email(),
 	password: z
@@ -8,10 +13,10 @@ export const authSignupSchema = z.object({
 		.min(8, "Password must be at least 8 characters long")
 		.refine((password) => {
 			const conditions = [
-				/[a-z]/.test(password), // Lowercase
-				/[A-Z]/.test(password), // Uppercase
-				/\d/.test(password), // Number
-				/[!@#$%^&*]/.test(password), // Special character
+				lowercaseRegex.test(password),
+				uppercaseRegex.test(password),
+				numberRegex.test(password),
+				specialCharRegex.test(password),
 			];
 			return conditions.filter(Boolean).length >= 3;
 		}, "Password must include at least 3 of the following: lowercase, uppercase, number, special character (!@#$%^&*)"),

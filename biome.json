@@ -21,7 +21,17 @@
 		"rules": {
 			"recommended": true,
 			"style": {
-				"useFilenamingConvention": "error"
+				"useFilenamingConvention": "error",
+				"noDefaultExport": "error",
+				"noParameterAssign": "error",
+				"noUselessElse": "error",
+				"noYodaExpression": "error",
+				"useConsistentArrayType": "error",
+				"useConsistentBuiltinInstantiation": "error",
+				"useConst": "error",
+				"useDefaultParameterLast": "error",
+				"useDefaultSwitchClause": "error",
+				"useExplicitLengthCheck": "error"
 			},
 			"correctness": {
 				"noUnusedImports": "error",
@@ -31,7 +41,18 @@
 				"noConsole": "error"
 			},
 			"nursery": {
-				"noProcessEnv": "error"
+				"noProcessEnv": "error",
+				"noSecrets": "error"
+			},
+			"performance": {
+				"noAccumulatingSpread": "error",
+				"noBarrelFile": "error",
+				"noDelete": "error",
+				"noReExportAll": "error",
+				"useTopLevelRegex": "error"
+			},
+			"security": {
+				"noGlobalEval": "error"
 			}
 		}
 	},

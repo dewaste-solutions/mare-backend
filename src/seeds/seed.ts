@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { permissions, rolePermissions, roles } from "../db/schema";
+import { permissions, rolePermissions, roles } from "../db/schema/auth";
 
 (async function seed() {
 	try {
