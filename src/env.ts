@@ -7,6 +7,7 @@ expand(
 	config({
 		path: path.resolve(
 			process.cwd(),
+			// biome-ignore lint/nursery/noProcessEnv: <explanation>
 			process.env.NODE_ENV === "test" ? ".env.test" : ".env",
 		),
 	}),
@@ -21,6 +22,7 @@ const EnvSchema = z.object({
 
 export type env = z.infer<typeof EnvSchema>;
 
+// biome-ignore lint/nursery/noProcessEnv: <explanation>
 const { data: env, error } = EnvSchema.safeParse(process.env);
 
 if (error) {

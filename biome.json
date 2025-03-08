@@ -29,6 +29,9 @@
 			},
 			"suspicious": {
 				"noConsole": "error"
+			},
+			"nursery": {
+				"noProcessEnv": "error"
 			}
 		}
 	},
