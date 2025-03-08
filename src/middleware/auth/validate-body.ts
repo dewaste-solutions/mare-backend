@@ -25,9 +25,8 @@ export function validateAuthSignup(
 	next: NextFunction,
 ): void {
 	const result = authSignupSchema.safeParse(req.body);
-
 	if (!result.success) {
-		res.status(400).json({ success: false, message: "Invalid input" });
+		res.status(400).json({ message: "Invalid input" });
 		return;
 	}
 
@@ -47,7 +46,7 @@ export function validateAuthSignIn(
 	const result = authSigninSchema.safeParse(req.body);
 
 	if (!result.success) {
-		res.status(400).json({ success: false, message: "Invalid input" });
+		res.status(400).json({ message: "Invalid input" });
 		return;
 	}
 
