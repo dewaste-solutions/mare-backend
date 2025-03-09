@@ -7,8 +7,15 @@ import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { authRoutes } from "./routes/auth-route";
 
 const app = express();
-const PORT = env.BACKEND_PORT || 5000;
+const PORT = env.BACKEND_PORT
 
+// app.use(
+// 	cors({
+// 	  origin: "http://localhost.com", // Replace with your frontend's origin
+// 	  methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
+// 	  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+// 	})
+// );
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
