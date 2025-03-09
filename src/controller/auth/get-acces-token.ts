@@ -1,5 +1,5 @@
 import { fromUnixTime, getUnixTime } from "date-fns";
-import { and, eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
@@ -24,58 +24,35 @@ export const getAccessToken = async (req: Request, res: Response) => {
 			.select({
 				notAfter: sessions.notAfter,
 				revoked: refreshTokens.revoked,
+				sessionId: refreshTokens.sessionId,
 			})
 			.from(refreshTokens)
 			.innerJoin(sessions, eq(refreshTokens.sessionId, sessions.id))
 			.where(eq(refreshTokens.token, refreshTokenCookies))
 			.limit(1);
 
-		if (sessionRecord.length === 0) {
+		if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
 			res.status(401).json({ message: "Unauthorized" });
 			return;
 		}
 
-		const { notAfter, revoked } = sessionRecord[0];
+		const { notAfter, sessionId } = sessionRecord[0];
 
 		if (notAfter < now) {
-			res.status(401).json({ message: "Unauthorized" });
-			return;
-		}
-
-		if (revoked) {
-			res.status(401).json({ message: "Unauthorized" });
-			return;
-		}
-
-		const record = await db
-			.select({
-				sessionNotAfter: sessions.notAfter,
-				sessionId: sessions.id,
-				userId: sessions.userId,
-			})
-			.from(refreshTokens)
-			.innerJoin(sessions, eq(refreshTokens.sessionId, sessions.id))
-			.where(
-				and(
-					eq(refreshTokens.token, refreshTokenCookies),
-					gt(sessions.notAfter, now),
-				),
-			);
-
-		if (record.length === 0) {
-			res.status(401).json({ message: "Unauthorized" });
+			res.status(401).json({ message: "Session expired, please log in again" });
 			return;
 		}
 
 		if (
-			decodedRefreshToken === null ||
+			!decodedRefreshToken ||
 			typeof decodedRefreshToken !== "object" ||
-			decodedRefreshToken.email === undefined
+			!decodedRefreshToken.email
 		) {
 			res.status(401).json({ message: "Unauthorized" });
 			return;
 		}
 
+		// Get user and permissions
 		const existingUser = await db
 			.select({
 				id: users.id,
@@ -109,6 +86,8 @@ export const getAccessToken = async (req: Request, res: Response) => {
 		const permissionsArray = permissionList.map((p) => p.scope);
 
 		const privateKey = env.BACKEND_AUTH_PRIVATE_KEY;
+
+		// Generate new access token
 		const accessToken = jwt.sign(
 			{
 				email: existingUser[0].email,
@@ -120,6 +99,40 @@ export const getAccessToken = async (req: Request, res: Response) => {
 			privateKey,
 			{ expiresIn: "5m", algorithm: "HS256" },
 		);
+
+		// Generate a new refresh token (ROTATION)
+		const newRefreshToken = jwt.sign(
+			{
+				email: existingUser[0].email,
+				id: sessionId,
+			},
+			privateKey,
+			{ expiresIn: "7d" },
+		);
+
+		// Perform token rotation inside a transaction
+		await db.transaction(async (tx) => {
+			// Revoke old refresh token
+			await tx
+				.update(refreshTokens)
+				.set({ revoked: true })
+				.where(eq(refreshTokens.token, refreshTokenCookies));
+
+			// Insert new refresh token
+			await tx.insert(refreshTokens).values({
+				sessionId: sessionId,
+				token: newRefreshToken,
+				updatedAt: now,
+			});
+		});
+
+		// Set new refresh token in HTTP-only cookie
+		res.cookie("refreshToken", newRefreshToken, {
+			httpOnly: true,
+			secure: true,
+			sameSite: "strict",
+			maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+		});
 
 		res
 			.status(200)

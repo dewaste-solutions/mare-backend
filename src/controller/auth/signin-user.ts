@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { addWeeks, fromUnixTime, getUnixTime } from "date-fns";
+import { addMonths, fromUnixTime, getUnixTime } from "date-fns";
 import { and, eq, gt, inArray, lt } from "drizzle-orm";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -123,7 +123,7 @@ export async function signInUser(req: Request, res: Response) {
 						.values({
 							userId: existingUser[0].id,
 							updatedAt: now,
-							notAfter: addWeeks(fromUnixTime(getUnixTime(new Date())), 1),
+							notAfter: addMonths(fromUnixTime(getUnixTime(new Date())), 1),
 							ipAddress,
 							userAgent,
 							refreshAt: now,
@@ -141,12 +141,10 @@ export async function signInUser(req: Request, res: Response) {
 				refreshToken = jwt.sign(
 					{
 						email: existingUser[0].email,
-						firstName: existingUser[0].firstName,
-						lastName: existingUser[0].lastName,
 						id: sessionId,
 					},
 					privateKey,
-					{ expiresIn: "1d" },
+					{ expiresIn: "7d" },
 				);
 
 				await tx
