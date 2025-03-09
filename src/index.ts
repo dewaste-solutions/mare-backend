@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/auth", applyRateLimit(RateLimitCategory.LENIENT), authRoutes);
+app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
 
 // Start Server
 app.listen(PORT, () => {
