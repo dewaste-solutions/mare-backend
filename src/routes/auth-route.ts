@@ -1,6 +1,6 @@
 import express from "express";
 import { createUser } from "../controller/auth/create-user";
-import { getAccessToken } from "../controller/auth/get-acces-token";
+import { getAccessToken } from "../controller/auth/get-access-token";
 import { getProfile } from "../controller/auth/get-profile";
 import { signInUser } from "../controller/auth/signin-user";
 import { signoutUser } from "../controller/auth/signout-user";

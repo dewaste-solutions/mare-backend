@@ -7,7 +7,7 @@ import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { authRoutes } from "./routes/auth-route";
 
 const app = express();
-const PORT = env.BACKEND_PORT
+const PORT = env.BACKEND_PORT;
 
 // app.use(
 // 	cors({
