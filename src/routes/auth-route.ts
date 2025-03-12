@@ -10,6 +10,7 @@ import {
 	validateAuthSignIn,
 	validateAuthSignup,
 } from "../middleware/auth/validate-body";
+import { checkPermissions } from "../middleware/rabc";
 
 export const authRoutes = express.Router();
 
@@ -19,12 +20,13 @@ authRoutes.post("/signin", validateAuthSignIn, signInUser);
 
 authRoutes.post("/signout", signoutUser);
 
-authRoutes.get("/profile", getProfile);
+authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
 
 authRoutes.post("/renew-access-token", getAccessToken);
 
 authRoutes.post(
 	"/generate-invitation",
+	checkPermissions(["create:invitation"]),
 	validateAuthInvitation,
 	createInvitationToken,
 );
