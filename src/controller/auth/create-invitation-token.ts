@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { addWeeks } from "date-fns";
 import { sql } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
@@ -17,6 +18,7 @@ export async function createInvitationToken(req: Request, res: Response) {
 			tokenType: "invitation",
 			metadata: { roleId },
 			updatedAt: sql`NOW()`,
+			notAfter: addWeeks(new Date(), 1),
 		});
 
 		res.status(201).json({ message: "One-time token created.", token });

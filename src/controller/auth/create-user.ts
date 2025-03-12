@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
-import { roles, users } from "../../db/schema/auth";
+import { oneTimeTokens, roles, users } from "../../db/schema/auth";
 
 // this function will change after invitation signup with token is implemented
 export async function createUser(req: Request, res: Response) {
@@ -42,7 +42,45 @@ export async function createUser(req: Request, res: Response) {
 
 			roleId = role[0].id;
 		} else {
-			roleId = invitationToken;
+			const tokenRecord = await db
+				.select({
+					id: oneTimeTokens.id,
+					revoked: oneTimeTokens.revoked,
+					notAfter: oneTimeTokens.notAfter,
+					metadata: oneTimeTokens.metadata,
+				})
+				.from(oneTimeTokens)
+				.where(
+					and(
+						eq(oneTimeTokens.tokenHash, invitationToken),
+						gt(oneTimeTokens.notAfter, sql`NOW()`),
+					),
+				)
+				.limit(1);
+
+			if (tokenRecord.length === 0) {
+				res
+					.status(400)
+					.json({ message: "Invalid or expired invitation token." });
+				return;
+			}
+
+			if (tokenRecord[0].revoked) {
+				res.status(400).json({ message: "This token has already been used." });
+				return;
+			}
+
+			const metadata = tokenRecord[0].metadata as { roleId?: string };
+			if (!metadata.roleId) {
+				res.status(500).json({ message: "Internal server error" });
+				return;
+			}
+			roleId = metadata.roleId;
+
+			await db
+				.update(oneTimeTokens)
+				.set({ revoked: true })
+				.where(eq(oneTimeTokens.id, tokenRecord[0].id));
 		}
 
 		const newUser = await db
