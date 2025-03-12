@@ -174,21 +174,7 @@ export async function signInUser(req: Request, res: Response) {
 	}
 }
 
-// notes
-// please check the scenario
-
-// scenario 1
-// 1. login in two different devices
-// 2. login logout the first device
-// 3. check the second device, it should be not logged out
-
-// scenario 2
-// 1. login in two different devices
-// 2. change the notAfter to make it expired
-// 3. login another (3rd) device
-// 4. check all devices, the first two should be logged out
-// 5. but the 3rd device should be logged in
-
 // notAfter = one month
 // access token = 5 min
 // refresh token = 1 week
+// invite token = 1 week

@@ -4,7 +4,6 @@ import type { Request, Response } from "express";
 import { db } from "../../db";
 import { oneTimeTokens, roles, users } from "../../db/schema/auth";
 
-// this function will change after invitation signup with token is implemented
 export async function createUser(req: Request, res: Response) {
 	try {
 		const { email, password, firstName, lastName, invitationToken } = req.body;
@@ -36,7 +35,7 @@ export async function createUser(req: Request, res: Response) {
 				.where(eq(roles.name, "guest"))
 				.limit(1);
 			if (role.length < 0) {
-				res.status(500).json({ message: "here: Internal server error" });
+				res.status(500).json({ message: "Internal server error" });
 				return;
 			}
 

@@ -107,7 +107,3 @@ export const getProfile = async (
 		return;
 	}
 };
-
-// notes
-// 1. return basic user details
-// 2. extend notAfter (+1day) if the notAfter is same as current day

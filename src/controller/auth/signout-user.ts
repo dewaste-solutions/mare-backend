@@ -73,12 +73,3 @@ export const signoutUser = async (req: Request, res: Response) => {
 		return;
 	}
 };
-
-// notes
-// please check the scenario
-
-// scenario 1
-// 1. signin 2 devices
-// 2. change the notAfter into expired
-// 3. signout in 1 device
-// 4. the other device should logout as well
