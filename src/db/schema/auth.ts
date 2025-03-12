@@ -43,9 +43,7 @@ export const profiles = authSchema.table("profiles", {
 
 export const sessions = authSchema.table("sessions", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	// If not_after is reached, the session expires.
 	notAfter: timestamp("not_after").notNull(),
-	// If a refresh token is used, refresh_at is updated.
 	refreshAt: timestamp("refresh_at").notNull(),
 	ipAddress: text("ip_address").notNull(),
 	userAgent: text("user_agent").notNull(),
