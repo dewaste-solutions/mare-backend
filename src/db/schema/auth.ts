@@ -89,9 +89,12 @@ export const oneTimeTokens = authSchema.table("one_time_tokens", {
 });
 
 export const userRoleEnum = pgEnum("user_role_enum", [
-	"super_admin",
 	"admin",
 	"guest",
+	"franchise",
+	"worker",
+	"manager",
+	"community",
 ]);
 
 export const roles = authSchema.table("roles", {

@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { isAccessTokenValidated } from "../helper/auth/validate-token";
 
 // <verb>:<resource>
-// Common verbs include "read", "write", "create", "update", "delete"
+// Common verbs include "read", "write", "create", "update", "delete", "approve", "invite",
 // Resources can include specific entities, data types, or functionalities (e.g., "users", "products", "orders", "settings").
 
 // sample use
