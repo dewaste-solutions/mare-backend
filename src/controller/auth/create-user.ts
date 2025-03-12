@@ -7,7 +7,7 @@ import { roles, users } from "../../db/schema/auth";
 // this function will change after invitation signup with token is implemented
 export async function createUser(req: Request, res: Response) {
 	try {
-		const { email, password, firstName, lastName } = req.body;
+		const { email, password, firstName, lastName, invitationToken } = req.body;
 
 		const existingUser = await db
 			.select()
@@ -27,14 +27,22 @@ export async function createUser(req: Request, res: Response) {
 			return;
 		}
 
-		const role = await db
-			.select({ id: roles.id })
-			.from(roles)
-			.where(eq(roles.name, "guest"))
-			.limit(1);
-		if (role.length < 0) {
-			res.status(500).json({ message: "here: Internal server error" });
-			return;
+		let roleId: string;
+
+		if (!invitationToken) {
+			const role = await db
+				.select({ id: roles.id })
+				.from(roles)
+				.where(eq(roles.name, "guest"))
+				.limit(1);
+			if (role.length < 0) {
+				res.status(500).json({ message: "here: Internal server error" });
+				return;
+			}
+
+			roleId = role[0].id;
+		} else {
+			roleId = invitationToken;
 		}
 
 		const newUser = await db
@@ -45,7 +53,7 @@ export async function createUser(req: Request, res: Response) {
 				email,
 				updatedAt: sql`NOW()`,
 				encryptedPassword: hashedPassword,
-				roleId: role[0].id,
+				roleId: roleId,
 			})
 			.returning({
 				id: users.id,
