@@ -57,3 +57,22 @@ export function validateAuthSignIn(
 
 	next();
 }
+
+export const authInvitationSchema = z.object({
+	roleId: z.string(),
+});
+
+export function validateAuthInvitation(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+): void {
+	const result = authInvitationSchema.safeParse(req.body);
+
+	if (!result.success) {
+		res.status(400).json({ message: "Invalid input" });
+		return;
+	}
+
+	next();
+}

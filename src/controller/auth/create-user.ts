@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
 import { users } from "../../db/schema/auth";
@@ -33,7 +33,7 @@ export async function createUser(req: Request, res: Response) {
 				firstName,
 				lastName,
 				email,
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 				encryptedPassword: hashedPassword,
 				roleId: "10000000-0000-0000-0000-000000000003",
 			})

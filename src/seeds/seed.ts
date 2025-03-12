@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { db } from "../db";
 import { permissions, rolePermissions, roles } from "../db/schema/auth";
 
@@ -12,17 +13,17 @@ import { permissions, rolePermissions, roles } from "../db/schema/auth";
 			{
 				id: "10000000-0000-0000-0000-000000000001",
 				name: "super_admin",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 			{
 				id: "10000000-0000-0000-0000-000000000002",
 				name: "admin",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 			{
 				id: "10000000-0000-0000-0000-000000000003",
 				name: "guest",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 		]);
 
@@ -33,25 +34,25 @@ import { permissions, rolePermissions, roles } from "../db/schema/auth";
 				id: "20000000-0000-0000-0000-000000000001",
 				description: "Can create and modify users",
 				scope: "write:users",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 			{
 				id: "20000000-0000-0000-0000-000000000002",
 				description: "Can read user details",
 				scope: "read:users",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 			{
 				id: "20000000-0000-0000-0000-000000000003",
 				description: "Can delete users",
 				scope: "delete:users",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 			{
 				id: "20000000-0000-0000-0000-000000000004",
 				description: "Can update user details",
 				scope: "update:users",
-				updatedAt: new Date(),
+				updatedAt: sql`NOW()`,
 			},
 		]);
 
