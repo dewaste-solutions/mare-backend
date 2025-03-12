@@ -186,3 +186,7 @@ export async function signInUser(req: Request, res: Response) {
 // 3. login another (3rd) device
 // 4. check all devices, the first two should be logged out
 // 5. but the 3rd device should be logged in
+
+// notAfter = one month
+// access token = 5 min
+// refresh token = 1 week
