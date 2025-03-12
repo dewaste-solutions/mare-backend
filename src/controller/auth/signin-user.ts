@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
-import { addMonths, fromUnixTime, getUnixTime } from "date-fns";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
@@ -84,7 +83,10 @@ export async function signInUser(req: Request, res: Response) {
 		// need to make sure that can handle multiple devices login
 		try {
 			await db.transaction(async (tx) => {
-				const now = fromUnixTime(getUnixTime(new Date()));
+				const nowResult = await db.execute(
+					sql`SELECT NOW() AS current_timestamp`,
+				);
+				const now = new Date(nowResult.rows[0].current_timestamp);
 				const activeSession = await tx
 					.select({ id: sessions.id, notAfter: sessions.notAfter })
 					.from(sessions)
@@ -105,7 +107,7 @@ export async function signInUser(req: Request, res: Response) {
 						.values({
 							userId: existingUser[0].id,
 							updatedAt: now,
-							notAfter: addMonths(fromUnixTime(getUnixTime(new Date())), 1),
+							notAfter: sql`NOW() + INTERVAL '1 month'`,
 							ipAddress,
 							userAgent,
 							refreshAt: now,
