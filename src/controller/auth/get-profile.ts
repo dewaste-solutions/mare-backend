@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
 import { refreshTokens, sessions, users } from "../../db/schema/auth";
@@ -53,35 +53,6 @@ export const getProfile = async (
 		if (record.length === 0) {
 			res.status(401).json({ message: "Unauthorized" });
 			return;
-		}
-
-		const sessionId = record[0].sessionId;
-		const sessionNotAfter = new Date(record[0].sessionNotAfter);
-		// SELECT DATE(NOW()) AS current_timestamp; // no time
-		// SELECT NOW() AS current_timestamp; // with time
-		const nowResult = await db.execute(sql`SELECT DATE(NOW()) AS current_date`);
-		const nowDate = new Date(nowResult.rows[0].current_date);
-
-		const sessionNotAfterDay = sessionNotAfter.getUTCDate();
-		const sessionNotAfterMonth = sessionNotAfter.getUTCMonth();
-		const sessionNotAfterYear = sessionNotAfter.getUTCFullYear();
-
-		const nowYear = nowDate.getUTCFullYear();
-		const nowMonth = nowDate.getUTCMonth();
-		const nowDay = nowDate.getUTCDate();
-
-		const isSameDay =
-			Number(sessionNotAfterDay) === Number(nowDay) &&
-			Number(sessionNotAfterMonth) === Number(nowMonth) &&
-			Number(sessionNotAfterYear) === Number(nowYear);
-
-		if (isSameDay) {
-			const newNotAfter = new Date(sessionNotAfter);
-			newNotAfter.setDate(newNotAfter.getDate() + 1);
-			await db
-				.update(sessions)
-				.set({ notAfter: newNotAfter })
-				.where(eq(sessions.id, sessionId));
 		}
 
 		const userId = record[0].userId;
