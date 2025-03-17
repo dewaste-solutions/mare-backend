@@ -155,7 +155,7 @@ export async function signInUser(req: Request, res: Response) {
 				permission: permissionsArray,
 			},
 			privateKey,
-			{ expiresIn: "5m", algorithm: "HS256" },
+			{ expiresIn: "1d", algorithm: "HS256" },
 		);
 
 		// Set refresh token cookie
