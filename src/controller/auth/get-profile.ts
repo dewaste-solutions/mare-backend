@@ -2,41 +2,13 @@ import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
 import { refreshTokens, sessions, users } from "../../db/schema/auth";
-import {
-	isAccessTokenValidated,
-	isRefreshTokenValidated,
-} from "../../helper/auth/validate-token";
 
 export const getProfile = async (
 	req: Request,
 	res: Response,
 ): Promise<void> => {
 	try {
-		const authHeader = req.headers.authorization;
-		const accessToken = authHeader?.split(" ")[1];
-		if (!accessToken) {
-			res.status(500).json({ message: "Internal server error" });
-			return;
-		}
-
-		const { isTokenValid } = await isAccessTokenValidated({
-			accessToken,
-			returnDecoded: false,
-		});
-
-		if (!isTokenValid) {
-			res.status(401).json({ message: "Unauthorized: Invalid token" });
-			return;
-		}
-
 		const refreshTokenCookies = req.cookies.refreshToken;
-		if (
-			!refreshTokenCookies ||
-			!(await isRefreshTokenValidated(refreshTokenCookies))
-		) {
-			res.status(401).json({ message: "Unauthorized" });
-			return;
-		}
 
 		// get record table from refresh and session table
 		const record = await db
