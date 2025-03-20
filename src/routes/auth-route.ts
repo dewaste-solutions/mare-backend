@@ -11,6 +11,7 @@ import {
 	validateAuthSignup,
 } from "../middleware/auth/validate-body";
 import { checkPermissions } from "../middleware/rabc";
+import { getInvitedList } from "../controller/auth/get-invited-list";
 
 export const authRoutes = express.Router();
 
@@ -29,4 +30,12 @@ authRoutes.post(
 	checkPermissions(["create:invitation"]),
 	validateAuthInvitation,
 	createInvitationToken,
+);
+
+authRoutes.post("/invited-users", createInvitationToken);
+
+authRoutes.get(
+    "/invited-users",
+    checkPermissions(["read:invited-users"]),
+    getInvitedList 
 );
