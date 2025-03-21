@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import type { Request, Response } from "express";
 import { db } from "../../db";
 import { oneTimeTokens } from "../../db/schema/auth";
+import { sendInvitationEmail } from "../../helper/nodemailer/template/invitation";
 
 export async function createInvitationToken(req: Request, res: Response) {
 	try {
@@ -21,6 +22,9 @@ export async function createInvitationToken(req: Request, res: Response) {
 		});
 
 		res.status(201).json({ message: "One-time token created." });
+
+		// TODO, create a transaction here when invitation is failed, then rollback the token creation
+		await sendInvitationEmail({ invitationLink: "", role: "", to: "" });
 		return;
 	} catch (_error) {
 		res.status(500).json({ message: "Internal server error" });
