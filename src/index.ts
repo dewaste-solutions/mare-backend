@@ -1,22 +1,29 @@
-import express from "express";
-import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import cors from "cors";
+import express from "express";
 
-dotenv.config();
+import { env } from "./env";
+import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
+import { authRoutes } from "./routes/auth-route";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = env.BACKEND_PORT;
 
-// Middleware
+// app.use(
+// 	cors({
+// 	  origin: "http://localhost.com", // Replace with your frontend's origin
+// 	  methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
+// 	  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+// 	})
+// );
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
-// Basic Route
-app.get("/", (req, res) => {
-  res.send("Express + TypeScript Server is running!");
-});
+app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+	// biome-ignore lint/suspicious/noConsole:
+	console.log(`Server running on http://localhost:${PORT}`);
 });

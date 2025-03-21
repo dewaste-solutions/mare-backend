@@ -1,0 +1,12 @@
+services:
+
+  db1:
+    image: postgres:15
+    container_name: auth_db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DOCKER_PASSWORD}
+      POSTGRES_USER: ${DOCKER_USER}
+      POSTGRES_DB: ${DOCKER_NAME}
+    ports: 
+      - ${DOCKER_PORT}:5432
