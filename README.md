@@ -4,14 +4,16 @@
 Create an `.env` file in the root directory and configure the required environment variables:
 
 ```bash
+NODE_ENV=development
 DATABASE_URL=
 BACKEND_PORT=
-BACKEND_AUTH_PRIVATE_KEY=
+BACKEND_AUTH_PRIVATE_KEY=openssl rand -hex 64
 BACKEND_NODEMAILER_HOST=
 BACKEND_NODEMAILER_PORT=
 BACKEND_NODEMAILER_EMAIL=
 BACKEND_NODEMAILER_PASS=
 BACKEND_NODEMAILER_SERVICE=
+BACKEND_FRONTEND_URL=
 ```
 
 ## Database setup
@@ -20,6 +22,8 @@ You can set up a PostgreSQL database using your preferred method:
 
 Using Docker (Optional):
 ```bash
+// make sure to copy the required environment variables for docker from env-sample
+
 docker compose up
 // to close the container
 docker compose down

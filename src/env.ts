@@ -14,7 +14,7 @@ expand(
 );
 
 const EnvSchema = z.object({
-	NODE_ENV: z.string().default("development"),
+	NODE_ENV: z.string(),
 	BACKEND_PORT: z.coerce.number().default(6000),
 	DATABASE_URL: z.string(),
 	BACKEND_AUTH_PRIVATE_KEY: z.string(),

@@ -129,7 +129,7 @@ export async function signInUser(req: Request, res: Response) {
 						role: existingUser[0].role,
 					},
 					privateKey,
-					{ expiresIn: "7d" },
+					{ expiresIn: "7d", algorithm: "HS256" },
 				);
 
 				await tx
