@@ -16,7 +16,7 @@ export async function verifyInvitationToken(req: Request, res: Response) {
 		const now = new Date(nowResult.rows[0].current_timestamp);
 
 		const token = await db
-			.select()
+			.select({ id: oneTimeTokens.id, revoked: oneTimeTokens.revoked })
 			.from(oneTimeTokens)
 			.where(
 				and(
@@ -30,6 +30,11 @@ export async function verifyInvitationToken(req: Request, res: Response) {
 			res.status(400).json({ message: "Invalid or expired token." });
 			return;
 		}
+
+		await db
+			.update(oneTimeTokens)
+			.set({ revoked: true })
+			.where(eq(oneTimeTokens.id, token[0].id));
 
 		res.status(200).json({ message: "Token is valid." });
 		return;

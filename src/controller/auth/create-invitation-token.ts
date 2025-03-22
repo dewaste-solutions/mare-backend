@@ -29,7 +29,7 @@ export async function createInvitationToken(req: Request, res: Response) {
 
 			try {
 				await sendInvitationEmail({
-					invitationLink: `${env.BACKEND_FRONTEND_URL}/application?invitationToken=${token}`,
+					invitationLink: `${env.BACKEND_FRONTEND_URL}/application?invitationToken=${hashedToken}`,
 					role: roleName[0].name,
 					to: emailTo,
 				});

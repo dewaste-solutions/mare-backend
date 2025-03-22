@@ -81,7 +81,6 @@ export const oneTimeTokens = authSchema.table("one_time_tokens", {
 	revoked: boolean("revoked").default(false),
 	metadata: jsonb("metadata"),
 	notAfter: timestamp("not_after").notNull(),
-	userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
