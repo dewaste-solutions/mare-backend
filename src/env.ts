@@ -20,7 +20,7 @@ const EnvSchema = z.object({
 	BACKEND_AUTH_PRIVATE_KEY: z.string(),
 	BACKEND_NODEMAILER_HOST: z.string(),
 	BACKEND_NODEMAILER_PORT: z.coerce.number().default(587),
-	BACKEND_NODEMAILER_EMAIL: z.string(),
+	BACKEND_NODEMAILER_EMAIL: z.string().email(),
 	BACKEND_NODEMAILER_PASS: z.string(),
 	BACKEND_NODEMAILER_SERVICE: z.string(),
 	BACKEND_FRONTEND_URL: z.string().url(),

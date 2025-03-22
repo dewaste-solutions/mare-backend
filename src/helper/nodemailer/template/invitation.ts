@@ -52,7 +52,6 @@ export const sendInvitationEmail = async ({
           .btn {
               display: inline-block;
               background: #43c466;
-              color: white;
               text-decoration: none;
               padding: 12px 20px;
               border-radius: 5px;
@@ -73,9 +72,9 @@ export const sendInvitationEmail = async ({
               You're Invited to Dewaste Solution!
           </div>
           <div class="content">
-              <p>You have been invited to join <strong>Dewaste Solution</strong> as a <strong>${role}</strong>.</p>
+              <p>You have been invited to join <strong>Dewaste Solution</strong> as <strong>${role}</strong>.</p>
               <p>Click the button below to accept your invitation. You will be redirected to the Dewaste Solution application to complete the necessary requirements.</p>
-              <a href="${invitationLink}" class="btn">Accept Invitation</a>
+              <a href="${invitationLink}" class="btn" style="color: white;">Accept Invitation</a>
               <p>If you have any questions, feel free to reach out to us.</p>
               <p>Best regards,<br>Dewaste Solution Team</p>
           </div>
