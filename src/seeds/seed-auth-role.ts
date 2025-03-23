@@ -69,6 +69,12 @@ export async function seedAuthRole() {
 			scope: "generate:access-token",
 			updatedAt: sql`NOW()`,
 		},
+		{
+			id: "e05fd612-8619-4d3a-a931-08ad0f7c5083",
+			description: "Can read roles",
+			scope: "read:roles",
+			updatedAt: sql`NOW()`,
+		},
 	]);
 
 	// biome-ignore lint/suspicious/noConsole:
@@ -85,6 +91,7 @@ export async function seedAuthRole() {
 	const publicPermissions = [
 		"12c8c2cb-8ed1-4f6d-8f1a-d47937a15992", // read:profile
 		"3bcc231d-6ad6-4095-9e3b-b38196e8d868", // generate:access-token
+		"e05fd612-8619-4d3a-a931-08ad0f7c5083", // read:roles
 	];
 	const publicRolePermissions = roleIds.flatMap((roleId) =>
 		publicPermissions.map((permissionId) => ({ roleId, permissionId })),

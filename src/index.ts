@@ -5,6 +5,7 @@ import express from "express";
 import { env } from "./env";
 import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { authRoutes } from "./routes/auth-route";
+import { commonRoute } from "./routes/common-route";
 
 const app = express();
 const PORT = env.BACKEND_PORT;
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
+app.use("/api/common", applyRateLimit(RateLimitCategory.LENIENT), commonRoute);
 
 // Start Server
 app.listen(PORT, () => {

@@ -2,6 +2,7 @@ import express from "express";
 import { createInvitationToken } from "../controller/auth/create-invitation-token";
 import { createUser } from "../controller/auth/create-user";
 import { getAccessToken } from "../controller/auth/get-access-token";
+import { getAllRole } from "../controller/auth/get-all-role";
 import { getProfile } from "../controller/auth/get-profile";
 import { signInUser } from "../controller/auth/signin-user";
 import { signoutUser } from "../controller/auth/signout-user";
@@ -46,3 +47,11 @@ authRoutes.post(
 );
 
 authRoutes.post("/verify-invitation", verifyInvitationToken);
+
+authRoutes.get(
+	"/get-all-role",
+	checkPermissions({
+		requiredPermissions: ["read:roles"],
+	}),
+	getAllRole,
+);
