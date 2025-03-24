@@ -13,7 +13,6 @@ export const getProfile = async (
 		// get record table from refresh and session table
 		const record = await db
 			.select({
-				sessionNotAfter: sessions.notAfter,
 				sessionId: sessions.id,
 				userId: sessions.userId,
 			})

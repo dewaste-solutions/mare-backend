@@ -43,7 +43,6 @@ export const profiles = authSchema.table("profiles", {
 
 export const sessions = authSchema.table("sessions", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	notAfter: timestamp("not_after").notNull(),
 	refreshAt: timestamp("refresh_at").notNull(),
 	ipAddress: text("ip_address").notNull(),
 	userAgent: text("user_agent").notNull(),

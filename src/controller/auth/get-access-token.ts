@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
@@ -25,12 +25,8 @@ export const getAccessToken = async (req: Request, res: Response) => {
 			return;
 		}
 
-		const nowResult = await db.execute(sql`SELECT NOW() AS current_timestamp`);
-		const now = new Date(nowResult.rows[0].current_timestamp);
-
 		const sessionRecord = await db
 			.select({
-				notAfter: sessions.notAfter,
 				revoked: refreshTokens.revoked,
 				sessionId: refreshTokens.sessionId,
 				userId: sessions.userId,
@@ -42,13 +38,6 @@ export const getAccessToken = async (req: Request, res: Response) => {
 
 		if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
 			res.status(401).json({ message: "Unauthorized" });
-			return;
-		}
-
-		const { notAfter } = sessionRecord[0];
-
-		if (notAfter < now) {
-			res.status(401).json({ message: "Session expired, please log in again" });
 			return;
 		}
 

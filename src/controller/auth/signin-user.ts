@@ -92,7 +92,6 @@ export async function signInUser(req: Request, res: Response) {
 					.values({
 						userId: existingUser[0].id,
 						updatedAt: now,
-						notAfter: sql`NOW() + INTERVAL '1 month'`,
 						ipAddress,
 						userAgent,
 						refreshAt: now,
@@ -158,7 +157,6 @@ export async function signInUser(req: Request, res: Response) {
 	}
 }
 
-// notAfter = one month
 // access token = 1 day
 // refresh token = 1 week
 // invite token = 1 week

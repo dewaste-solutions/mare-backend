@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { refreshTokens, sessions } from "../db/schema/auth";
@@ -16,7 +16,6 @@ import {
  *
  * - Validates the access token.
  * - Validates the refresh token, including revocation status.
- * - Validates if the session is still active (`notAfter`).
  * - Confirms the user has the required permissions.
  *
  * @param requiredPermissions - List of required permission scopes (e.g., `["read:profile"]`).
@@ -61,7 +60,6 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 
 			const sessionRecord = await db
 				.select({
-					notAfter: sessions.notAfter,
 					revoked: refreshTokens.revoked,
 					sessionId: refreshTokens.sessionId,
 				})
@@ -70,20 +68,8 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 				.where(eq(refreshTokens.token, refreshTokenCookies))
 				.limit(1);
 
-			const nowResult = await db.execute(
-				sql`SELECT NOW() AS current_timestamp`,
-			);
-			const now = new Date(nowResult.rows[0].current_timestamp);
-
 			if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
 				res.status(401).json({ message: "Unauthorized: Invalid session" });
-				return;
-			}
-
-			if (sessionRecord[0].notAfter < now) {
-				res
-					.status(401)
-					.json({ message: "Session expired, please log in again" });
 				return;
 			}
 
