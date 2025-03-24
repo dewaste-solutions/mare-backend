@@ -33,24 +33,29 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 			const authHeader = req.headers.authorization;
 			const accessToken = authHeader?.split(" ")[1];
 			if (!accessToken) {
-				res.status(500).json({ message: "Internal server error" });
+				res.status(401).json({ message: "Unauthorized: Missing access token" });
 				return;
 			}
 
-			const { isTokenValid, decodedAccessToken } = await isAccessTokenValidated(
-				{ accessToken, returnDecoded: true },
-			);
+			const { isTokenValid: isAccessTokenValid, decodedAccessToken } =
+				await isAccessTokenValidated({ accessToken, returnDecoded: true });
 
-			if (!isTokenValid || !decodedAccessToken) {
-				res.status(401).json({ message: "Unauthorized: Invalid token" });
+			if (!isAccessTokenValid || !decodedAccessToken) {
+				res.status(401).json({ message: "Unauthorized: Invalid access token" });
 				return;
 			}
 
 			const refreshTokenCookies = req.cookies.refreshToken;
-			const isRefreshTokenValidatedResult =
-				await isRefreshTokenValidated(refreshTokenCookies);
-			if (!refreshTokenCookies || !isRefreshTokenValidatedResult) {
-				res.status(401).json({ message: "Unauthorized" });
+			const { isTokenValid: isRefreshTokenValid } =
+				await isRefreshTokenValidated({
+					refreshToken: refreshTokenCookies,
+					returnDecoded: false,
+				});
+
+			if (!refreshTokenCookies || !isRefreshTokenValid) {
+				res
+					.status(401)
+					.json({ message: "Unauthorized: Missing refresh token" });
 				return;
 			}
 
@@ -71,13 +76,11 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 			const now = new Date(nowResult.rows[0].current_timestamp);
 
 			if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
-				res.status(401).json({ message: "Unauthorized" });
+				res.status(401).json({ message: "Unauthorized: Invalid session" });
 				return;
 			}
 
-			const { notAfter } = sessionRecord[0];
-
-			if (notAfter < now) {
+			if (sessionRecord[0].notAfter < now) {
 				res
 					.status(401)
 					.json({ message: "Session expired, please log in again" });
@@ -86,13 +89,9 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 
 			if (
 				typeof decodedAccessToken !== "object" ||
-				decodedAccessToken === null
+				decodedAccessToken === null ||
+				!decodedAccessToken.permission
 			) {
-				res.status(401).json({ message: "Unauthorized: Invalid token format" });
-				return;
-			}
-
-			if (!decodedAccessToken.permission) {
 				res.status(401).json({ message: "Unauthorized: Invalid token format" });
 				return;
 			}

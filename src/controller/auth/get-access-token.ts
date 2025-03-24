@@ -11,12 +11,20 @@ import {
 	users,
 } from "../../db/schema/auth";
 import { env } from "../../env";
-import { decryptToken } from "../../helper/auth/validate-token";
+import { isRefreshTokenValidated } from "../../helper/auth/validate-token";
 
 export const getAccessToken = async (req: Request, res: Response) => {
 	try {
 		const refreshTokenCookies = req.cookies.refreshToken;
-		await decryptToken(refreshTokenCookies);
+		const { isTokenValid } = await isRefreshTokenValidated({
+			refreshToken: refreshTokenCookies,
+			returnDecoded: false,
+		});
+		if (!refreshTokenCookies || !isTokenValid) {
+			res.status(401).json({ message: "Unauthorized" });
+			return;
+		}
+
 		const nowResult = await db.execute(sql`SELECT NOW() AS current_timestamp`);
 		const now = new Date(nowResult.rows[0].current_timestamp);
 
