@@ -126,7 +126,6 @@ export async function signInUser(req: Request, res: Response) {
 				refreshToken = jwt.sign(
 					{
 						email: existingUser[0].email,
-						role: existingUser[0].role,
 					},
 					privateKey,
 					{ expiresIn: "7d", algorithm: "HS256" },

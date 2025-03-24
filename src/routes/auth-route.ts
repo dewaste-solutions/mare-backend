@@ -22,36 +22,17 @@ authRoutes.post("/signin", validateAuthSignIn, signInUser);
 
 authRoutes.post("/signout", signoutUser);
 
-authRoutes.get(
-	"/profile",
-	checkPermissions({ requiredPermissions: ["read:profile"] }),
-	getProfile,
-);
+authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
 
-authRoutes.post(
-	"/renew-access-token",
-	checkPermissions({
-		requiredPermissions: ["generate:access-token"],
-		checkAccessToken: false,
-	}),
-	getAccessToken,
-);
+authRoutes.post("/renew-access-token", getAccessToken);
 
 authRoutes.post(
 	"/generate-invitation",
-	checkPermissions({
-		requiredPermissions: ["create:invitation"],
-	}),
+	checkPermissions(["create:invitation"]),
 	validateAuthInvitation,
 	createInvitationToken,
 );
 
 authRoutes.post("/verify-invitation", verifyInvitationToken);
 
-authRoutes.get(
-	"/get-all-role",
-	checkPermissions({
-		requiredPermissions: ["read:roles"],
-	}),
-	getAllRole,
-);
+authRoutes.get("/get-all-role", checkPermissions(["read:roles"]), getAllRole);
