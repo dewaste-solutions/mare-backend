@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import { and, eq, gt, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
@@ -80,48 +80,31 @@ export async function signInUser(req: Request, res: Response) {
 		const privateKey = env.BACKEND_AUTH_PRIVATE_KEY;
 		let refreshToken: string | null = null;
 
-		// this try catch will handle session management and refresh management
-		// need to make sure that can handle multiple devices login
 		try {
 			await db.transaction(async (tx) => {
 				const nowResult = await db.execute(
 					sql`SELECT NOW() AS current_timestamp`,
 				);
 				const now = new Date(nowResult.rows[0].current_timestamp);
-				const activeSession = await tx
-					.select({ id: sessions.id, notAfter: sessions.notAfter })
-					.from(sessions)
-					.where(
-						and(
-							eq(sessions.userId, existingUser[0].id),
-							gt(sessions.notAfter, now),
-						),
-					);
 
-				let sessionId: string;
+				const newSession = await tx
+					.insert(sessions)
+					.values({
+						userId: existingUser[0].id,
+						updatedAt: now,
+						notAfter: sql`NOW() + INTERVAL '1 month'`,
+						ipAddress,
+						userAgent,
+						refreshAt: now,
+					})
+					.returning({ id: sessions.id });
 
-				if (activeSession.length > 0) {
-					sessionId = activeSession[0].id;
-				} else {
-					const newSession = await tx
-						.insert(sessions)
-						.values({
-							userId: existingUser[0].id,
-							updatedAt: now,
-							notAfter: sql`NOW() + INTERVAL '1 month'`,
-							ipAddress,
-							userAgent,
-							refreshAt: now,
-						})
-						.returning({ id: sessions.id });
-
-					if (newSession.length === 0) {
-						res.status(500).json({ message: "Internal server error" });
-						return;
-					}
-
-					sessionId = newSession[0].id;
+				if (newSession.length === 0) {
+					res.status(500).json({ message: "Internal server error" });
+					return;
 				}
+
+				const sessionId = newSession[0].id;
 
 				refreshToken = jwt.sign(
 					{
