@@ -1,10 +1,14 @@
 import { eq } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { refreshTokens, sessions } from "../../db/schema/auth";
 import { decryptToken } from "../../helper/auth/validate-token";
 
-export const signoutUser = async (req: Request, res: Response) => {
+export const signoutUser = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const token = req.cookies.refreshToken;
 
@@ -46,8 +50,7 @@ export const signoutUser = async (req: Request, res: Response) => {
 		res.clearCookie("refreshToken");
 		res.status(200).json({ message: "Signed out" });
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 };

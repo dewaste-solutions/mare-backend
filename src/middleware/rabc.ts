@@ -95,8 +95,8 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 			}
 
 			next();
-		} catch (_error) {
-			res.status(500).json({ message: "Internal server error" });
+		} catch (error) {
+			next(error);
 		}
 	};
 };

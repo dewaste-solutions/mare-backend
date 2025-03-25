@@ -1,9 +1,13 @@
 import { and, eq, gt, sql } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { oneTimeTokens } from "../../db/schema/auth";
 
-export async function verifyInvitationToken(req: Request, res: Response) {
+export async function verifyInvitationToken(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		const invitationToken = req.query.invitationToken as string | undefined;
 
@@ -38,7 +42,7 @@ export async function verifyInvitationToken(req: Request, res: Response) {
 
 		res.status(200).json({ message: "Token is valid." });
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
+	} catch (error) {
+		next(error);
 	}
 }

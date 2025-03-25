@@ -1,10 +1,11 @@
 import { sql } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 
 export const getCurrentDate = async (
 	_req: Request,
 	res: Response,
+	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const dateNowResult = await db.execute(
@@ -17,8 +18,7 @@ export const getCurrentDate = async (
 
 		res.status(200).json({ currentDate, timeZone });
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 };

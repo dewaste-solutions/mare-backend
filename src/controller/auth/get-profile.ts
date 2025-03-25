@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { refreshTokens, roles, sessions, users } from "../../db/schema/auth";
 
 export const getProfile = async (
 	req: Request,
 	res: Response,
+	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const refreshTokenCookies = req.cookies.refreshToken;
@@ -47,8 +48,7 @@ export const getProfile = async (
 
 		res.status(200).json(userProfile[0]);
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 };

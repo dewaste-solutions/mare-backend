@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
 import {
@@ -13,7 +13,11 @@ import {
 import { env } from "../../env";
 import { isRefreshTokenValidated } from "../../helper/auth/validate-token";
 
-export const getAccessToken = async (req: Request, res: Response) => {
+export const getAccessToken = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const refreshTokenCookies = req.cookies.refreshToken;
 		const { isTokenValid } = await isRefreshTokenValidated({
@@ -100,7 +104,7 @@ export const getAccessToken = async (req: Request, res: Response) => {
 		res
 			.status(200)
 			.json({ message: "Access token generated successfully", accessToken });
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
+	} catch (error) {
+		next(error);
 	}
 };

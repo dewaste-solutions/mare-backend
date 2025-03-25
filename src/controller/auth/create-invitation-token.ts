@@ -1,12 +1,16 @@
 import crypto from "node:crypto";
 import { eq, sql } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { oneTimeTokens, roles } from "../../db/schema/auth";
 import { env } from "../../env";
 import { sendInvitationEmail } from "../../helper/nodemailer/template/invitation";
 
-export async function createInvitationToken(req: Request, res: Response) {
+export async function createInvitationToken(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		const { roleId, emailTo } = req.body;
 
@@ -33,15 +37,14 @@ export async function createInvitationToken(req: Request, res: Response) {
 					role: roleName[0].name,
 					to: emailTo,
 				});
-			} catch (_error) {
+			} catch (error) {
 				tx.rollback();
+				next(error);
 			}
 		});
 
 		res.status(201).json({ message: "One-time token created." });
-		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 }

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
 import {
@@ -14,7 +14,11 @@ import {
 } from "../../db/schema/auth";
 import { env } from "../../env";
 
-export async function signInUser(req: Request, res: Response) {
+export async function signInUser(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		const { email, password } = req.body;
 		const ipAddress = (
@@ -123,9 +127,8 @@ export async function signInUser(req: Request, res: Response) {
 					})
 					.returning({ id: refreshTokens.id });
 			});
-		} catch (_error) {
-			res.status(500).json({ message: "Internal server error" });
-			return;
+		} catch (error) {
+			next(error);
 		}
 
 		// Generate access token
@@ -151,9 +154,8 @@ export async function signInUser(req: Request, res: Response) {
 		// return the access token in the response
 		res.status(200).json({ message: "User signin successfully", accessToken });
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 }
 
