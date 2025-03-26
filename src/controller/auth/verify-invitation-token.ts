@@ -17,7 +17,7 @@ export async function verifyInvitationToken(
 		}
 
 		const nowResult = await db.execute(sql`SELECT NOW() AS current_timestamp`);
-		const now = new Date(nowResult.rows[0].current_timestamp);
+		const now = new Date(nowResult.rows[0].current_timestamp as string);
 
 		const token = await db
 			.select({ id: oneTimeTokens.id, revoked: oneTimeTokens.revoked })
