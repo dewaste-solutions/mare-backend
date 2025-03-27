@@ -75,7 +75,7 @@ export const getAccessToken = async (
 			.where(eq(rolePermissionConnection.roleId, existingUser[0].roleId));
 
 		if (permissionList.length === 0) {
-			res.status(500).json({ message: "Internal server error" });
+			res.status(403).json({ message: "Forbidden: Insufficient permissions" });
 			return;
 		}
 

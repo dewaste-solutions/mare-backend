@@ -31,7 +31,7 @@ export async function verifyInvitationToken(
 			.limit(1);
 
 		if (token.length === 0 || token[0].revoked) {
-			res.status(400).json({ message: "Invalid or expired token." });
+			res.status(401).json({ message: "Invalid or expired token." });
 			return;
 		}
 
@@ -40,7 +40,7 @@ export async function verifyInvitationToken(
 			.set({ revoked: true })
 			.where(eq(oneTimeTokens.id, token[0].id));
 
-		res.status(200).json({ message: "Token is valid." });
+		res.status(204).end();
 		return;
 	} catch (error) {
 		next(error);

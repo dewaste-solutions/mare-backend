@@ -48,7 +48,7 @@ export const signoutUser = async (
 			.where(eq(refreshTokens.id, tokenRecord[0].tokenId));
 
 		res.clearCookie("refreshToken");
-		res.status(200).json({ message: "Signed out" });
+		res.status(204).end();
 		return;
 	} catch (error) {
 		next(error);
