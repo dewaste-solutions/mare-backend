@@ -59,3 +59,6 @@ Production Mode
 npm run build
 npm run start
 ```
+
+<!-- about race condition in database -->
+<!-- https://github.com/drizzle-team/drizzle-orm/issues/2875 -->

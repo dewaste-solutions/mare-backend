@@ -13,7 +13,7 @@
 		"db:studio": "npx drizzle-kit studio",
 		"db:check": "npx drizzle-kit check",
 		"db:up": "npx drizzle-kit up",
-		"seed": "ts-node src/seeds/seed.ts",
+		"seed": "ts-node seeds/seed.ts",
 		"biome": "npx @biomejs/biome check --write .",
 		"package:check": "npx npm-check-updates",
 		"package:upgrade": "npx npm-check-updates -u"

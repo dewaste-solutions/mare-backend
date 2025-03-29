@@ -30,8 +30,12 @@ app.use("/api/shared", applyRateLimit(RateLimitCategory.LENIENT), sharedRoute);
 
 app.use(notFoundLogger());
 
-// Start Server
-app.listen(PORT, () => {
-	// biome-ignore lint/suspicious/noConsole:
-	console.log(`Server running on http://localhost:${PORT}`);
-});
+// Start Server only if this file is being run directly (not imported for testing)
+if (require.main === module) {
+	app.listen(PORT, () => {
+		// biome-ignore lint/suspicious/noConsole:
+		console.log(`Server running on http://localhost:${PORT}`);
+	});
+}
+
+export { app };

@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
-import { and, eq, gt, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
-import { oneTimeTokens, roles, users } from "../../db/schema/auth";
+import { roles, users } from "../../db/schema/auth";
 
 export async function createUser(
 	req: Request,
@@ -11,7 +11,6 @@ export async function createUser(
 ) {
 	try {
 		const { email, password, firstName, lastName } = req.body;
-		const invitationToken = req.query.invitationToken as string | undefined;
 
 		const existingUser = await db
 			.select()
@@ -31,61 +30,17 @@ export async function createUser(
 			return;
 		}
 
-		let roleId: string;
-
-		if (!invitationToken) {
-			const role = await db
-				.select({ id: roles.id })
-				.from(roles)
-				.where(eq(roles.name, "guest"))
-				.limit(1);
-			if (role.length < 0) {
-				res.status(500).json({ message: "Internal server error" });
-				return;
-			}
-
-			roleId = role[0].id;
-		} else {
-			const tokenRecord = await db
-				.select({
-					id: oneTimeTokens.id,
-					revoked: oneTimeTokens.revoked,
-					notAfter: oneTimeTokens.notAfter,
-					metadata: oneTimeTokens.metadata,
-				})
-				.from(oneTimeTokens)
-				.where(
-					and(
-						eq(oneTimeTokens.tokenHash, invitationToken),
-						gt(oneTimeTokens.notAfter, sql`NOW()`),
-					),
-				)
-				.limit(1);
-
-			if (tokenRecord.length === 0) {
-				res
-					.status(400)
-					.json({ message: "Invalid or expired invitation token." });
-				return;
-			}
-
-			if (tokenRecord[0].revoked) {
-				res.status(400).json({ message: "This token has already been used." });
-				return;
-			}
-
-			const metadata = tokenRecord[0].metadata as { roleId?: string };
-			if (!metadata.roleId) {
-				res.status(500).json({ message: "Internal server error" });
-				return;
-			}
-			roleId = metadata.roleId;
-
-			await db
-				.update(oneTimeTokens)
-				.set({ revoked: true })
-				.where(eq(oneTimeTokens.id, tokenRecord[0].id));
+		const role = await db
+			.select({ id: roles.id })
+			.from(roles)
+			.where(eq(roles.name, "guest"))
+			.limit(1);
+		if (role.length === 0) {
+			res.status(500).json({ message: "Internal server error" });
+			return;
 		}
+
+		const roleId = role[0].id;
 
 		const newUser = await db
 			.insert(users)

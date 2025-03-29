@@ -1,32 +1,8 @@
-import { db } from "../db";
-import { env } from "../env";
-import { tryCatch } from "../helper/tryCatch";
+import { env } from "../src/env";
 import { seedAuthAccount } from "./seed-auth-account";
 import { seedAuthRole } from "./seed-auth-role";
-
-async function truncateAllTables() {
-	// Get all schemas except system schemas
-	const schemas = await db.execute(
-		`SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast')`,
-	);
-
-	for (const { schema_name } of schemas.rows) {
-		// Get all tables in the schema
-		const tables = await db.execute(
-			`SELECT tablename FROM pg_tables WHERE schemaname = '${schema_name}'`,
-		);
-
-		for (const { tablename } of tables.rows) {
-			// Truncate each table
-			await db.execute(
-				`TRUNCATE TABLE "${schema_name}"."${tablename}" CASCADE`,
-			);
-
-			// biome-ignore lint/suspicious/noConsole:
-			console.log(`✅ Truncated table: ${schema_name}.${tablename}`);
-		}
-	}
-}
+import { truncateAllTables } from "./truncate-all-tables";
+import { tryCatch } from "./tryCatch";
 
 (async function seed() {
 	if (env.NODE_ENV !== "development") {
@@ -63,7 +39,7 @@ async function truncateAllTables() {
 		process.exit(1);
 	}
 
-	// biome-ignore lint/suspicious/noConsole:
+	// biome-ignore lint/suspicious/noConsole: <explanation>
 	console.table(
 		seedAuthAccountData.map(({ email }) => ({
 			email,
