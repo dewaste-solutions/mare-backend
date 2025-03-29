@@ -40,15 +40,13 @@ export async function createInvitationToken(
 			});
 
 			roleName = roleResult[0]?.name ?? null;
-		});
 
-		if (roleName) {
 			await sendInvitationEmail({
 				invitationLink: `${env.BACKEND_FRONTEND_URL}/application?invitationToken=${hashedToken}`,
 				role: roleName,
 				to: emailTo,
 			});
-		}
+		});
 
 		res.status(201).json({ message: "One-time token created." });
 	} catch (error) {
