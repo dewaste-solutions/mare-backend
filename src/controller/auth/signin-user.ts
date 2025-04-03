@@ -152,7 +152,9 @@ export async function signInUser(
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
 		});
 		// return the access token in the response
-		res.status(200).json({ message: "User signin successfully", accessToken });
+		res
+			.status(200)
+			.json({ message: "User signin successfully", data: accessToken });
 		return;
 	} catch (error) {
 		next(error);

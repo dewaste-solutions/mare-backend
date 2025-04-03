@@ -103,7 +103,10 @@ export const getAccessToken = async (
 
 		res
 			.status(200)
-			.json({ message: "Access token generated successfully", accessToken });
+			.json({
+				message: "Access token generated successfully",
+				data: accessToken,
+			});
 	} catch (error) {
 		next(error);
 	}

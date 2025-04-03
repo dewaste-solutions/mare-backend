@@ -16,7 +16,12 @@ export const getCurrentDate = async (
 		const currentDate = dateNowResult.rows[0].current_timestamp;
 		const timeZone = Object.values(timeZoneResult.rows[0])[0];
 
-		res.status(200).json({ currentDate, timeZone });
+		res
+			.status(200)
+			.json({
+				message: "Current date fetched successfully",
+				data: { currentDate, timeZone },
+			});
 		return;
 	} catch (error) {
 		next(error);

@@ -12,7 +12,9 @@ export const getAllRole = async (
 			.select({ id: roles.id, name: roles.name })
 			.from(roles);
 
-		res.status(200).json(allRoles);
+		res
+			.status(200)
+			.json({ message: "Roles fetched successfully", data: allRoles });
 		return;
 	} catch (error) {
 		next(error);

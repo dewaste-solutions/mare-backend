@@ -46,7 +46,9 @@ export const getProfile = async (
 			return;
 		}
 
-		res.status(200).json(userProfile[0]);
+		res
+			.status(200)
+			.json({ message: "Profile fetched successfully", data: userProfile[0] });
 		return;
 	} catch (error) {
 		next(error);
