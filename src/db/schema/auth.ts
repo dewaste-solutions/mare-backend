@@ -126,9 +126,9 @@ export const rolePermissions = authSchema.table(
 );
 
 export const invitedUsers = authSchema.table("invited_users", {
-    id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-    email: text("email").notNull().unique(),
-    invitationToken: text("invitation_token").notNull(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+	email: text("email").notNull().unique(),
+	invitationToken: text("invitation_token").notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
