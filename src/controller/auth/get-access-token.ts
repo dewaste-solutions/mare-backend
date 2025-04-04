@@ -101,12 +101,10 @@ export const getAccessToken = async (
 			{ expiresIn: "1d", algorithm: "HS256" },
 		);
 
-		res
-			.status(200)
-			.json({
-				message: "Access token generated successfully",
-				data: accessToken,
-			});
+		res.status(200).json({
+			message: "Access token generated successfully",
+			data: accessToken,
+		});
 	} catch (error) {
 		next(error);
 	}

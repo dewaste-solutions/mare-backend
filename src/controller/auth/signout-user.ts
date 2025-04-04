@@ -42,10 +42,15 @@ export const signoutUser = async (
 			return;
 		}
 
-		await db
+		const result = await db
 			.update(refreshTokens)
 			.set({ revoked: true })
 			.where(eq(refreshTokens.id, tokenRecord[0].tokenId));
+
+		if (result.rowCount === 0) {
+			res.status(404).json({ message: "Failed to revoke token" });
+			return;
+		}
 
 		res.clearCookie("refreshToken");
 		res.status(204).end();
