@@ -48,7 +48,7 @@ export const signoutUser = async (
 			.where(eq(refreshTokens.id, tokenRecord[0].tokenId));
 
 		if (result.rowCount === 0) {
-			res.status(404).json({ message: "Failed to revoke token" });
+			res.status(400).json({ message: "Token found, but failed to revoke" });
 			return;
 		}
 
