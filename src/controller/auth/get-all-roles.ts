@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { roles } from "../../db/schema/auth";
 
-export const getAllRole = async (
+export const getAllRoles = async (
 	_req: Request,
 	res: Response,
 	next: NextFunction,
