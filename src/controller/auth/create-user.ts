@@ -36,7 +36,7 @@ export async function createUser(
 			.where(eq(roles.name, "guest"))
 			.limit(1);
 		if (role.length === 0) {
-			res.status(500).json({ message: "Internal server error" });
+			res.status(404).json({ message: "Guest role not found in the system" });
 			return;
 		}
 

@@ -53,7 +53,7 @@ export const signoutUser = async (
 		}
 
 		res.clearCookie("refreshToken");
-		res.status(204).end();
+		res.status(200).json({ message: "Signed out successfully" });
 		return;
 	} catch (error) {
 		next(error);
