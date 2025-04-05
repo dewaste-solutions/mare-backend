@@ -56,7 +56,9 @@ export async function seedAuthRole() {
 			"generate:access-token",
 			"read:roles",
 		];
-		const publicRolePermissions = insertedRoles.flatMap((role) =>
+		const publicRolePermissions = insertedRoles
+		.filter((role) => role.name !== "guest")
+		.flatMap((role) =>
 			publicPermissions.map((perm) => ({
 				roleId: role.id,
 				permissionId: permissionMap[perm],
