@@ -1,6 +1,7 @@
 import { env } from "../src/env";
 import { seedAuthAccount } from "./seed-auth-account";
 import { seedAuthRole } from "./seed-auth-role";
+import { seedStatuses } from "./seed-statuses";
 import { truncateAllTables } from "./truncate-all-tables";
 import { tryCatch } from "./tryCatch";
 
@@ -36,6 +37,13 @@ import { tryCatch } from "./tryCatch";
 	if (seedAuthAccountError) {
 		// biome-ignore lint/suspicious/noConsole:
 		console.error(seedAuthAccountError);
+		process.exit(1);
+	}
+
+	const { error: seedStatusesError } = await tryCatch(seedStatuses());
+	if (seedStatusesError) {
+		// biome-ignore lint/suspicious/noConsole:
+		console.error(seedStatusesError);
 		process.exit(1);
 	}
 
