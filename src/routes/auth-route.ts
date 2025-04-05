@@ -24,6 +24,7 @@ authRoutes.post("/signout", signoutUser);
 
 authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
 
+// getAccessToken also have checkPermissions generate:access-token
 authRoutes.post("/renew-access-token", getAccessToken);
 
 authRoutes.post(
