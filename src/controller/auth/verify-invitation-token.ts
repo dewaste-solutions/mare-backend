@@ -37,7 +37,7 @@ export async function verifyInvitationToken(
 
 		await db
 			.update(oneTimeTokens)
-			.set({ revoked: true })
+			.set({ updatedAt: sql`NOW()` })
 			.where(eq(oneTimeTokens.id, token[0].id));
 
 		res.status(204).end();

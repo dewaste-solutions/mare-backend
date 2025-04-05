@@ -77,7 +77,7 @@ export const oneTimeTokens = authSchema.table("one_time_tokens", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
 	tokenType: tokenTypeEnum("token_type").notNull(),
 	tokenHash: text("token_hash").notNull().unique(),
-	revoked: boolean("revoked").default(false),
+	revoked: boolean("revoked"),
 	metadata: jsonb("metadata"),
 	notAfter: timestamp("not_after").notNull(),
 	userId: uuid("user_id").references(() => profiles.id, {
