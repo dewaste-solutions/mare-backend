@@ -51,29 +51,26 @@ export async function seedAuthRole() {
 		);
 
 		// Assign public permissions to all roles
-		const publicPermissions = [
-			"read:profile",
-			"generate:access-token",
-			"read:roles",
-		];
+		const publicPermissions = ["read:profile", "generate:access-token"];
 		const publicRolePermissions = insertedRoles
-		.filter((role) => role.name !== "guest")
-		.flatMap((role) =>
-			publicPermissions.map((perm) => ({
-				roleId: role.id,
-				permissionId: permissionMap[perm],
-			})),
-		);
+			.filter((role) => role.name !== "guest")
+			.flatMap((role) =>
+				publicPermissions.map((perm) => ({
+					roleId: role.id,
+					permissionId: permissionMap[perm],
+				})),
+			);
 		await tx.insert(rolePermissionConnection).values(publicRolePermissions);
 
 		// Assign admin-only permission
-		if (roleMap.admin && permissionMap["create:invitation"]) {
-			await tx.insert(rolePermissionConnection).values([
-				{
-					roleId: roleMap.admin,
-					permissionId: permissionMap["create:invitation"],
-				},
-			]);
+		if (roleMap.admin) {
+			const adminOnlyPermissions = ["create:invitation", "read:roles"];
+
+			const adminRolePermissions = adminOnlyPermissions.map((scope) => ({
+				roleId: roleMap.admin,
+				permissionId: permissionMap[scope],
+			}));
+			await tx.insert(rolePermissionConnection).values(adminRolePermissions);
 		}
 	});
 }
