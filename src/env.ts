@@ -18,6 +18,10 @@ const EnvSchema = z.object({
 	BACKEND_PORT: z.coerce.number().default(6000),
 	DATABASE_URL: z.string(),
 	BACKEND_AUTH_PRIVATE_KEY: z.string(),
+	CLOUDINARY_CLOUD_NAME: z.string(),
+	CLOUDINARY_API_KEY: z.string(),
+	CLOUDINARY_API_SECRET: z.string(),
+	URL_DOCS_VIEWER: z.string().url(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
