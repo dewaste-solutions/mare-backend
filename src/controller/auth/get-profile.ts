@@ -1,11 +1,12 @@
 import { eq } from "drizzle-orm";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { refreshTokens, roles, sessions, users } from "../../db/schema/auth";
 
 export const getProfile = async (
 	req: Request,
 	res: Response,
+	next: NextFunction,
 ): Promise<void> => {
 	try {
 		const refreshTokenCookies = req.cookies.refreshToken;
@@ -13,7 +14,6 @@ export const getProfile = async (
 		// get record table from refresh and session table
 		const record = await db
 			.select({
-				sessionNotAfter: sessions.notAfter,
 				sessionId: sessions.id,
 				userId: sessions.userId,
 			})
@@ -46,10 +46,11 @@ export const getProfile = async (
 			return;
 		}
 
-		res.status(200).json(userProfile[0]);
+		res
+			.status(200)
+			.json({ message: "Profile fetched successfully", data: userProfile[0] });
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 };

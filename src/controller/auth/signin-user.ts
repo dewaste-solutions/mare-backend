@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import { and, eq, gt, sql } from "drizzle-orm";
-import type { Request, Response } from "express";
+import { eq, sql } from "drizzle-orm";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
 import {
@@ -14,7 +14,11 @@ import {
 } from "../../db/schema/auth";
 import { env } from "../../env";
 
-export async function signInUser(req: Request, res: Response) {
+export async function signInUser(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		const { email, password } = req.body;
 		const ipAddress = (
@@ -80,56 +84,38 @@ export async function signInUser(req: Request, res: Response) {
 		const privateKey = env.BACKEND_AUTH_PRIVATE_KEY;
 		let refreshToken: string | null = null;
 
-		// this try catch will handle session management and refresh management
-		// need to make sure that can handle multiple devices login
 		try {
 			await db.transaction(async (tx) => {
 				const nowResult = await db.execute(
 					sql`SELECT NOW() AS current_timestamp`,
 				);
-				const now = new Date(nowResult.rows[0].current_timestamp);
-				const activeSession = await tx
-					.select({ id: sessions.id, notAfter: sessions.notAfter })
-					.from(sessions)
-					.where(
-						and(
-							eq(sessions.userId, existingUser[0].id),
-							gt(sessions.notAfter, now),
-						),
-					);
+				const now = new Date(nowResult.rows[0].current_timestamp as string);
 
-				let sessionId: string;
+				const newSession = await tx
+					.insert(sessions)
+					.values({
+						userId: existingUser[0].id,
+						updatedAt: now,
+						ipAddress,
+						userAgent,
+						refreshAt: now,
+					})
+					.returning({ id: sessions.id });
 
-				if (activeSession.length > 0) {
-					sessionId = activeSession[0].id;
-				} else {
-					const newSession = await tx
-						.insert(sessions)
-						.values({
-							userId: existingUser[0].id,
-							updatedAt: now,
-							notAfter: sql`NOW() + INTERVAL '1 month'`,
-							ipAddress,
-							userAgent,
-							refreshAt: now,
-						})
-						.returning({ id: sessions.id });
-
-					if (newSession.length === 0) {
-						res.status(500).json({ message: "Internal server error" });
-						return;
-					}
-
-					sessionId = newSession[0].id;
+				if (newSession.length === 0) {
+					res.status(500).json({ message: "Internal server error" });
+					return;
 				}
+
+				const sessionId = newSession[0].id;
 
 				refreshToken = jwt.sign(
 					{
-						email: existingUser[0].email,
-						role: existingUser[0].role,
+						userId: existingUser[0].id,
+						sessionId: sessionId,
 					},
 					privateKey,
-					{ expiresIn: "7d" },
+					{ expiresIn: "7d", algorithm: "HS256" },
 				);
 
 				await tx
@@ -141,9 +127,8 @@ export async function signInUser(req: Request, res: Response) {
 					})
 					.returning({ id: refreshTokens.id });
 			});
-		} catch (_error) {
-			res.status(500).json({ message: "Internal server error" });
-			return;
+		} catch (error) {
+			next(error);
 		}
 
 		// Generate access token
@@ -167,15 +152,15 @@ export async function signInUser(req: Request, res: Response) {
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
 		});
 		// return the access token in the response
-		res.status(200).json({ message: "User signin successfully", accessToken });
+		res
+			.status(200)
+			.json({ message: "User signin successfully", data: accessToken });
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 }
 
-// notAfter = one month
 // access token = 1 day
 // refresh token = 1 week
 // invite token = 1 week

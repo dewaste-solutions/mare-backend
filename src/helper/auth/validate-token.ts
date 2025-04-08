@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
 import { refreshTokens, sessions } from "../../db/schema/auth";
@@ -43,12 +43,8 @@ export const isRefreshTokenValidated = async ({
 	if (!decodedRefreshToken)
 		return { decodedRefreshToken: null, isTokenValid: false };
 
-	const nowResult = await db.execute(sql`SELECT NOW() AS current_timestamp`);
-	const now = new Date(nowResult.rows[0].current_timestamp);
-
 	const sessionRecord = await db
 		.select({
-			notAfter: sessions.notAfter,
 			revoked: refreshTokens.revoked,
 		})
 		.from(refreshTokens)
@@ -59,9 +55,7 @@ export const isRefreshTokenValidated = async ({
 	if (sessionRecord.length === 0)
 		return { decodedRefreshToken: null, isTokenValid: false };
 
-	const { notAfter, revoked } = sessionRecord[0];
-
-	if (notAfter < now) return { decodedRefreshToken: null, isTokenValid: false };
+	const { revoked } = sessionRecord[0];
 
 	if (revoked) return { decodedRefreshToken: null, isTokenValid: false };
 
