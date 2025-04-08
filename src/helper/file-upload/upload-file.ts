@@ -10,7 +10,7 @@ export async function uploadFile(
 ) {
 	try {
 		// Handle file upload via the `uploadfiles` middleware
-		uploadfiles("file")(_req, res, async (err: any) => {
+		uploadfiles("file")(_req, res, function (err) {
 			// If there's an error in uploading, handle it here
 			if (err) {
 				return res.status(400).json({
@@ -40,19 +40,8 @@ export async function uploadFile(
 				? "image" 
 				: "unknown";
 			const publicId = file.public_id || file.filename;
-			const fileUrl = file.path;
+			const fileUrl = (fileExtension === ".png" || fileExtension === ".jpg" || fileExtension === ".jpeg") ? file.path : `${env.URL_DOCS_VIEWER}${file.path}`;
 
-			if( fileExtension === ".pdf" ||  fileExtension === ".docx" ){
-				res.status(201).json({
-					message: "File uploaded successfully",
-					file: {
-						originalName: originalName,
-						fileType: fileType,
-						fileUrl: `${env.URL_DOCS_VIEWER}${fileUrl}`,
-						publicId: publicId,
-					},
-				});
-			} else {
 				res.status(201).json({
 					message: "File uploaded successfully",
 					file: {
@@ -62,7 +51,7 @@ export async function uploadFile(
 						publicId: publicId,
 					},
 				});
-			}
+			
 					
 		});
 	} catch (error) {
