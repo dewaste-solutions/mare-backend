@@ -61,7 +61,7 @@ export const requirements = applicationSchema.table("requirements", {
 	placeholder: text("placeholder").notNull(),
 	defaultValue: text("default_value").notNull(),
 	component: text("component").notNull(),
-	onboardingStep: integer("onboarding_step")
+	requirementStep: integer("requirement_step")
 		.notNull(),
 	roleId: uuid("role_id")
 		.notNull()
