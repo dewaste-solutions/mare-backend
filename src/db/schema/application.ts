@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, pgSchema, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, pgSchema, text, timestamp, uuid, integer } from "drizzle-orm/pg-core";
 import { oneTimeTokens, roles, users } from "./auth";
 import { statuses } from "./shared";
 
@@ -44,10 +44,10 @@ export const requirementOptions = applicationSchema.table(
 	"requirement_options",
 	{
 		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-		placeholder: text("placeholder").notNull(),
-		component: text("component").notNull(),
-		isRequired: boolean("is_required").notNull(),
-		defaultValue: text("default_value").notNull(),
+		requirementsId: uuid("requirements_id")
+			.notNull()
+			.references(() => requirements.id, { onDelete: "cascade" }),
+		name: text("name").notNull(),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull(),
 	},
@@ -55,11 +55,14 @@ export const requirementOptions = applicationSchema.table(
 
 export const requirements = applicationSchema.table("requirements", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	requirementOptionsId: uuid("requirement_options_id")
-		.notNull()
-		.references(() => requirementOptions.id, { onDelete: "cascade" }),
 	name: text("name").notNull(),
 	description: text("description").notNull(),
+	isRequired: boolean("is_required").notNull(),
+	placeholder: text("placeholder").notNull(),
+	defaultValue: text("default_value").notNull(),
+	component: text("component").notNull(),
+	onboardingStep: integer("onboarding_step")
+		.notNull(),
 	roleId: uuid("role_id")
 		.notNull()
 		.references(() => roles.id, { onDelete: "set null" }),
