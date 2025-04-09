@@ -1,5 +1,5 @@
-import { pgSchema, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { pgSchema, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const sharedSchema = pgSchema("shared");
 
