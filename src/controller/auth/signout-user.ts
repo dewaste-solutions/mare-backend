@@ -1,10 +1,14 @@
-import { eq, sql } from "drizzle-orm";
-import type { Request, Response } from "express";
+import { eq } from "drizzle-orm";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { refreshTokens, sessions } from "../../db/schema/auth";
 import { decryptToken } from "../../helper/auth/validate-token";
 
-export const signoutUser = async (req: Request, res: Response) => {
+export const signoutUser = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
 	try {
 		const token = req.cookies.refreshToken;
 
@@ -26,7 +30,6 @@ export const signoutUser = async (req: Request, res: Response) => {
 			.select({
 				sessionId: refreshTokens.sessionId,
 				tokenId: refreshTokens.id,
-				notAfter: sessions.notAfter,
 			})
 			.from(refreshTokens)
 			.innerJoin(sessions, eq(refreshTokens.sessionId, sessions.id))
@@ -38,38 +41,16 @@ export const signoutUser = async (req: Request, res: Response) => {
 			res.status(404).json({ message: "Token not found" });
 			return;
 		}
-		const nowResult = await db.execute(sql`SELECT NOW() AS current_timestamp`);
-		const now = new Date(nowResult.rows[0].current_timestamp);
-		// if notAfter is less than current time and date, then revoked all refresh tokens based on sessionID
-		if (new Date(tokenRecord[0].notAfter) < now) {
-			const result = await db
-				.update(refreshTokens)
-				.set({ revoked: true })
-				.where(eq(refreshTokens.sessionId, tokenRecord[0].sessionId));
 
-			// Check if token was empty
-			if (result.rowCount === 0) {
-				res.status(404).json({ message: "No tokens found for this session" });
-				return;
-			}
-		} else {
-			// if notAfter is greater than current time and date, then revoke only the current token
-			const result = await db
-				.update(refreshTokens)
-				.set({ revoked: true })
-				.where(eq(refreshTokens.id, tokenRecord[0].tokenId));
-
-			if (result.rowCount === 0) {
-				res.status(404).json({ message: "No tokens found for this session" });
-				return;
-			}
-		}
+		await db
+			.update(refreshTokens)
+			.set({ revoked: true })
+			.where(eq(refreshTokens.id, tokenRecord[0].tokenId));
 
 		res.clearCookie("refreshToken");
-		res.status(200).json({ message: "Signed out" });
+		res.status(204).end();
 		return;
-	} catch (_error) {
-		res.status(500).json({ message: "Internal server error" });
-		return;
+	} catch (error) {
+		next(error);
 	}
 };

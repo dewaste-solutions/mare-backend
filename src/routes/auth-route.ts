@@ -2,10 +2,12 @@ import express from "express";
 import { createInvitationToken } from "../controller/auth/create-invitation-token";
 import { createUser } from "../controller/auth/create-user";
 import { getAccessToken } from "../controller/auth/get-access-token";
+import { getAllRole } from "../controller/auth/get-all-role";
 import { getInvitedList } from "../controller/auth/get-invited-list";
 import { getProfile } from "../controller/auth/get-profile";
 import { signInUser } from "../controller/auth/signin-user";
 import { signoutUser } from "../controller/auth/signout-user";
+import { verifyInvitationToken } from "../controller/auth/verify-invitation-token";
 import {
 	validateAuthInvitation,
 	validateAuthSignIn,
@@ -31,6 +33,10 @@ authRoutes.post(
 	validateAuthInvitation,
 	createInvitationToken,
 );
+
+authRoutes.post("/verify-invitation", verifyInvitationToken);
+
+authRoutes.get("/get-all-role", checkPermissions(["read:roles"]), getAllRole);
 
 authRoutes.post("/invited-users", createInvitationToken);
 

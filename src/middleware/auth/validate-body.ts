@@ -22,19 +22,17 @@ export const authSignupSchema = z.object({
 		}, "Password must include at least 3 of the following: lowercase, uppercase, number, special character (!@#$%^&*)"),
 	firstName: z.string(),
 	lastName: z.string(),
-	// this is not needed, this will bypass for sure
-	invitationToken: z.string().optional(),
 });
 
 export function validateAuthSignup(
 	req: Request,
-	res: Response,
+	_res: Response,
 	next: NextFunction,
 ): void {
 	const result = authSignupSchema.safeParse(req.body);
 	if (!result.success) {
-		res.status(400).json({ message: "Invalid input" });
-		return;
+		const message = `Zod :: ${result.error.errors[0].message} :: ${result.error.errors[0].path}`;
+		next(message);
 	}
 
 	next();
@@ -47,14 +45,14 @@ export const authSigninSchema = z.object({
 
 export function validateAuthSignIn(
 	req: Request,
-	res: Response,
+	_res: Response,
 	next: NextFunction,
 ): void {
 	const result = authSigninSchema.safeParse(req.body);
 
 	if (!result.success) {
-		res.status(400).json({ message: "Invalid input" });
-		return;
+		const message = `Zod :: ${result.error.errors[0].message} :: ${result.error.errors[0].path}`;
+		next(message);
 	}
 
 	next();
@@ -62,17 +60,19 @@ export function validateAuthSignIn(
 
 export const authInvitationSchema = z.object({
 	roleId: z.string(),
+	emailTo: z.string().email(),
 });
 
 export function validateAuthInvitation(
 	req: Request,
-	res: Response,
+	_res: Response,
 	next: NextFunction,
 ): void {
 	const result = authInvitationSchema.safeParse(req.body);
 
 	if (!result.success) {
-		res.status(400).json({ message: "Invalid input" });
+		const message = `Zod :: ${result.error.errors[0].message} :: ${result.error.errors[0].path}`;
+		next(message);
 		return;
 	}
 

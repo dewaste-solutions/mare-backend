@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const authSchema = pgSchema("auth");
+export const applicationSchema = pgSchema("application");
 
 export const users = authSchema.table("users", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
@@ -43,7 +44,6 @@ export const profiles = authSchema.table("profiles", {
 
 export const sessions = authSchema.table("sessions", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	notAfter: timestamp("not_after").notNull(),
 	refreshAt: timestamp("refresh_at").notNull(),
 	ipAddress: text("ip_address").notNull(),
 	userAgent: text("user_agent").notNull(),
@@ -81,7 +81,9 @@ export const oneTimeTokens = authSchema.table("one_time_tokens", {
 	revoked: boolean("revoked").default(false),
 	metadata: jsonb("metadata"),
 	notAfter: timestamp("not_after").notNull(),
-	userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+	userId: uuid("user_id").references(() => profiles.id, {
+		onDelete: "cascade",
+	}),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
@@ -112,8 +114,8 @@ export const permissions = authSchema.table("permissions", {
 	updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const rolePermissions = authSchema.table(
-	"role_permissions",
+export const rolePermissionConnection = authSchema.table(
+	"role_permissions_connection",
 	{
 		roleId: uuid("role_id")
 			.notNull()
@@ -125,10 +127,50 @@ export const rolePermissions = authSchema.table(
 	(table) => [primaryKey({ columns: [table.roleId, table.permissionId] })],
 );
 
-export const invitedUsers = authSchema.table("invited_users", {
+export const invitedUsers = applicationSchema.table("invited_users", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
 	email: text("email").notNull().unique(),
-	invitationToken: text("invitation_token").notNull(),
+	oneTimeTokenId: uuid("one_time_token_id")
+		.notNull()
+		.references(() => oneTimeTokens.id, { onDelete: "cascade" }),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const onboarding = applicationSchema.table("onboarding", {
+	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+	statusId: uuid("status_id").notNull(),
+	invitedUsersId: uuid("invited_users_id")
+		.notNull()
+		.references(() => invitedUsers.id, { onDelete: "cascade" }),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const requirementAnswers = applicationSchema.table(
+	"requirement_answers",
+	{
+		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+		requirementId: uuid("requirement_id").notNull(),
+		onboardingId: uuid("onboarding_id")
+			.notNull()
+			.references(() => onboarding.id, { onDelete: "cascade" }),
+		answer: text("answer"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at").notNull().defaultNow(),
+	},
+);
+
+export const requirementAnswersFiles = applicationSchema.table(
+	"requirement_answers_files",
+	{
+		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+		requirementFileId: uuid("requirement_file_id").notNull(),
+		filePath: text("file_path").notNull(),
+		onboardingId: uuid("onboarding_id")
+			.notNull()
+			.references(() => onboarding.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at").notNull().defaultNow(),
+	},
+);

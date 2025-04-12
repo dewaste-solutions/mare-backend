@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { db } from "../../db";
 import { refreshTokens, sessions } from "../../db/schema/auth";
@@ -6,7 +6,7 @@ import { env } from "../../env";
 
 export const decryptToken = async (token: string) => {
 	try {
-		return await jwt.verify(token, env.BACKEND_AUTH_PRIVATE_KEY);
+		return jwt.verify(token, env.BACKEND_AUTH_PRIVATE_KEY);
 	} catch (_) {
 		return null;
 	}
@@ -29,22 +29,22 @@ export const isAccessTokenValidated = async ({
 		: { decodedAccessToken: null, isTokenValid: !!decodedAccessToken };
 };
 
-export const isRefreshTokenValidated = async (
-	refreshToken: string,
-): Promise<boolean> => {
-	if (!refreshToken) return false;
-
-	// Validate token structure
+export const isRefreshTokenValidated = async ({
+	refreshToken,
+	returnDecoded = false,
+}: {
+	refreshToken: string;
+	returnDecoded: boolean;
+}): Promise<{
+	decodedRefreshToken: string | jwt.JwtPayload | null;
+	isTokenValid: boolean;
+}> => {
 	const decodedRefreshToken = await decryptToken(refreshToken);
-	if (!decodedRefreshToken) return false;
+	if (!decodedRefreshToken)
+		return { decodedRefreshToken: null, isTokenValid: false };
 
-	const nowResult = await db.execute(sql`SELECT NOW() AS current_timestamp`);
-	const now = new Date(nowResult.rows[0].current_timestamp);
-
-	// Check if the refresh token is associated with an expired or revoked session
 	const sessionRecord = await db
 		.select({
-			notAfter: sessions.notAfter,
 			revoked: refreshTokens.revoked,
 		})
 		.from(refreshTokens)
@@ -52,15 +52,14 @@ export const isRefreshTokenValidated = async (
 		.where(eq(refreshTokens.token, refreshToken))
 		.limit(1);
 
-	if (sessionRecord.length === 0) return false; // Token not found
+	if (sessionRecord.length === 0)
+		return { decodedRefreshToken: null, isTokenValid: false };
 
-	const { notAfter, revoked } = sessionRecord[0];
+	const { revoked } = sessionRecord[0];
 
-	// Check if session is expired
-	if (notAfter < now) return false;
+	if (revoked) return { decodedRefreshToken: null, isTokenValid: false };
 
-	// Check if refresh token is revoked
-	if (revoked) return false;
-
-	return true;
+	return returnDecoded
+		? { decodedRefreshToken, isTokenValid: true }
+		: { decodedRefreshToken: null, isTokenValid: true };
 };
