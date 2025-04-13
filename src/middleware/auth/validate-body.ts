@@ -60,7 +60,7 @@ export function validateAuthSignIn(
 
 export const authInvitationSchema = z.object({
 	roleId: z.string(),
-	emailTo: z.string().email(),
+	email: z.string().email(),
 });
 
 export function validateAuthInvitation(
