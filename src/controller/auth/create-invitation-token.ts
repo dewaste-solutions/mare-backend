@@ -52,6 +52,7 @@ export async function createInvitationToken(
 			await tx.insert(invitedUsers).values({
 				statusId: statusResult[0].id.toString(),
 				oneTimeTokensId: invitationResult[0].id,
+				email: emailTo,
 				updatedAt: sql`NOW()`,
 			});
 

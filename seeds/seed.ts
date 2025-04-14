@@ -1,6 +1,7 @@
 import { env } from "../src/env";
 import { seedAuthAccount } from "./seed-auth-account";
 import { seedAuthRole } from "./seed-auth-role";
+import { seedRequirements } from "./seed-requirements";
 import { seedStatuses } from "./seed-statuses";
 import { truncateAllTables } from "./truncate-all-tables";
 import { tryCatch } from "./tryCatch";
@@ -54,6 +55,13 @@ import { tryCatch } from "./tryCatch";
 			password: `${email.split("@")[0]}`,
 		})),
 	);
+
+	const { error: seedRequirementsError } = await tryCatch(seedRequirements());
+	if (seedRequirementsError) {
+		// biome-ignore lint/suspicious/noConsole:
+		console.error(seedRequirementsError);
+		process.exit(1);
+	}
 
 	// biome-ignore lint/suspicious/noConsole:
 	console.log("Seed data inserted successfully!");
