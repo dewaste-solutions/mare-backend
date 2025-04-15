@@ -151,7 +151,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "date" as const,
-		order: 1,
+		order: 2,
 		allowMultiple: false,
 	},
 	{
@@ -187,7 +187,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 2,
 		allowMultiple: false,
 	},
 	{
@@ -199,7 +199,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 3,
 		allowMultiple: false,
 	},
 	{
@@ -211,7 +211,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 3,
 		allowMultiple: false,
 	},
 	{
@@ -223,7 +223,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 3,
 		allowMultiple: false,
 	},
 	{
@@ -248,7 +248,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "radiogroup" as const,
-		order: 2,
+		order: 1,
 		allowMultiple: false,
 	}, // choices
 	{
@@ -260,7 +260,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 2,
+		order: 1,
 		allowMultiple: false,
 	},
 	{
@@ -286,7 +286,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "radiogroup" as const,
-		order: 3,
+		order: 1,
 		allowMultiple: false,
 	}, // choices
 	{
@@ -298,7 +298,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "radiogroup" as const,
-		order: 3,
+		order: 1,
 		allowMultiple: false,
 	}, // choices
 	{
@@ -310,7 +310,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "textarea" as const,
-		order: 3,
+		order: 2,
 		allowMultiple: false,
 	},
 
@@ -324,7 +324,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 4,
+		order: 1,
 		allowMultiple: false,
 	},
 	{
@@ -337,7 +337,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "textarea" as const,
-		order: 4,
+		order: 2,
 		allowMultiple: false,
 	},
 	{
@@ -350,7 +350,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 4,
+		order: 1,
 		allowMultiple: false,
 	},
 	{
@@ -363,7 +363,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "textarea" as const,
-		order: 4,
+		order: 2,
 		allowMultiple: false,
 	},
 
@@ -376,7 +376,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "select_upload" as const,
-		order: 5,
+		order: 1,
 		allowMultiple: false,
 	}, // choices
 ];
@@ -521,158 +521,4 @@ export async function seedRequirements() {
 
 		await tx.insert(requirementChoices).values(requirementChoicesWithQuestion);
 	});
-
-	// getting question
-	await db.transaction(async (tx) => {
-		const franchiseRoleResult = await tx
-			.select({ id: roles.id })
-			.from(roles)
-			.where(eq(roles.name, "franchise"));
-
-		// Get categories with their sections and questions
-		const categoriesWithSectionsAndQuestions = await tx
-			.select({
-				category: {
-					id: requirementCategories.id,
-					name: requirementCategories.name,
-					requirementStep: requirementCategories.requirementStep,
-				},
-				section: {
-					id: requirementSections.id,
-					name: requirementSections.name,
-					order: requirementSections.order,
-				},
-				question: {
-					id: requirementQuestion.id,
-					question: requirementQuestion.question,
-					description: requirementQuestion.description,
-					isRequired: requirementQuestion.isRequired,
-					placeholder: requirementQuestion.placeholder,
-					defaultValue: requirementQuestion.defaultValue,
-					component: requirementQuestion.component,
-					order: requirementQuestion.order,
-					allowMultiple: requirementQuestion.allowMultiple,
-				},
-				choice: {
-					name: requirementChoices.name,
-					id: requirementChoices.id,
-				},
-			})
-			.from(requirementCategories)
-			.where(eq(requirementCategories.roleId, franchiseRoleResult[0].id))
-			.leftJoin(
-				requirementSections,
-				eq(requirementSections.requirementCategoryId, requirementCategories.id),
-			)
-			.leftJoin(
-				requirementQuestion,
-				eq(requirementQuestion.requirementSectionId, requirementSections.id),
-			)
-			.leftJoin(
-				requirementChoices,
-				eq(requirementChoices.requirementQuestionId, requirementQuestion.id),
-			)
-			.orderBy(
-				requirementCategories.requirementStep,
-				requirementSections.order,
-				requirementQuestion.order,
-			);
-
-		// Transform the flat structure into nested format
-		const nestedStructure = categoriesWithSectionsAndQuestions.reduce(
-			(acc, row) => {
-				// Find or create category
-				let category = acc.find((c) => c.categoryName === row.category.name);
-				if (!category) {
-					category = {
-						categoryName: row.category.name,
-						categoryId: row.category.id,
-						requirementStep: row.category.requirementStep,
-						sections: [],
-					};
-					acc.push(category);
-				}
-
-				// Find or create section
-				if (row.section?.id) {
-					let section = category.sections.find(
-						(s) => s.sectionName === row.section?.name,
-					);
-					if (!section) {
-						section = {
-							sectionName: row.section.name,
-							sectionId: row.section.id,
-							sectionOrder: row.section.order,
-							questions: [],
-						};
-						category.sections.push(section);
-					}
-
-					// Add question if it exists
-					if (row.question?.id) {
-						let question = section.questions.find(
-							(q) => q.question === row.question?.question,
-						);
-						if (!question) {
-							question = {
-								question: row.question.question,
-								questionId: row.question.id,
-								description: row.question.description,
-								isRequired: row.question.isRequired,
-								placeholder: row.question.placeholder,
-								defaultValue: row.question.defaultValue,
-								component: row.question.component,
-								order: row.question.order,
-								allowMultiple: row.question.allowMultiple,
-								choices: [],
-							};
-							section.questions.push(question);
-						}
-
-						// Add choice if it exists
-						if (row.choice?.name) {
-							question.choices?.push({
-								name: row.choice.name,
-								id: row.choice.id,
-							});
-						}
-					}
-				}
-
-				return acc;
-			},
-			[] as Array<{
-				categoryName: string;
-				categoryId: string;
-				requirementStep: number;
-				sections: Array<{
-					sectionName: string;
-					sectionId: string;
-					sectionOrder: number;
-					questions: Array<{
-						question: string;
-						questionId: string;
-						description: string;
-						isRequired: boolean;
-						placeholder: string;
-						defaultValue: string;
-						component: string;
-						order: number | null;
-						allowMultiple: boolean;
-						choices?: Array<{
-							name: string;
-							id: string;
-						}>;
-					}>;
-				}>;
-			}>,
-		);
-
-		// biome-ignore lint/suspicious/noConsole: <explanation>
-		console.dir(nestedStructure, { depth: null });
-	});
-
-	// submit application
-
-	// display answers
 }
