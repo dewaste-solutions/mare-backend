@@ -1,5 +1,13 @@
 import { sql } from "drizzle-orm";
-import { boolean, pgSchema, text, timestamp, uuid, integer, pgEnum } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	integer,
+	pgEnum,
+	pgSchema,
+	text,
+	timestamp,
+	uuid,
+} from "drizzle-orm/pg-core";
 import { oneTimeTokens, roles, users } from "./auth";
 import { statuses } from "./shared";
 
@@ -30,18 +38,18 @@ export const onBoarding = applicationSchema.table("onboarding", {
 	updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const requirementChoices = applicationSchema.table("requirement_choices", 
+export const requirementChoices = applicationSchema.table(
+	"requirement_choices",
 	{
 		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
 		name: text("name").notNull(),
-		label: text("label").notNull(),
-		requirementId: uuid("requirement_id")
+		requirementQuestionId: uuid("requirement_question_id")
 			.notNull()
 			.references(() => requirementQuestion.id, { onDelete: "cascade" }),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull(),
-	}
-)
+	},
+);
 
 export const requirementsComponentEnum = pgEnum("requirements_component_enum", [
 	"radiogroup",
@@ -49,54 +57,65 @@ export const requirementsComponentEnum = pgEnum("requirements_component_enum", [
 	"input_email",
 	"textarea",
 	"date",
-	"select_upload"
+	"select_upload",
 ]);
 
-export const requirementSections = applicationSchema.table("requirement_sections", {
-	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	name: text("name").notNull().unique(),
-	order: integer("order").notNull(),
-	requirementCategoryId: uuid("requirement_category_id")
-		.notNull()
-		.references(() => requirementCategories.id, { onDelete: "cascade" }),
-	createdAt: timestamp("created_at").notNull().defaultNow(),
-	updatedAt: timestamp("updated_at").notNull(),
-});
+export const requirementSections = applicationSchema.table(
+	"requirement_sections",
+	{
+		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+		name: text("name").notNull().unique(),
+		order: integer("order").notNull(),
+		requirementCategoryId: uuid("requirement_category_id")
+			.notNull()
+			.references(() => requirementCategories.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at").notNull(),
+	},
+);
 
-export const requirementCategories = applicationSchema.table("requirement_categories", {
-	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	name: text("name").notNull().unique(),
-	requirementStep: integer("requirement_step").notNull(),
-	roleId : uuid("role_id")
-		.notNull()
-		.references(() => roles.id, { onDelete: "cascade" }),
-	createdAt: timestamp("created_at").notNull().defaultNow(),
-	updatedAt: timestamp("updated_at").notNull(),
-});
+export const requirementCategories = applicationSchema.table(
+	"requirement_categories",
+	{
+		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+		name: text("name").notNull().unique(),
+		requirementStep: integer("requirement_step").notNull(),
+		roleId: uuid("role_id")
+			.notNull()
+			.references(() => roles.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at").notNull(),
+	},
+);
 
-export const requirementQuestion = applicationSchema.table("requirement_question", {
-	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	question: text("name").notNull(),
-	description: text("description").notNull(),
-	isRequired: boolean("is_required").notNull(),
-	placeholder: text("placeholder").notNull(),
-	defaultValue: text("default_value").notNull(),
-	component: requirementsComponentEnum("component").notNull(),
-	order: integer("order"),
-	allowMultiple: boolean("allow_multiple").notNull(),
-	requirementSectionId: uuid("requirement_section_id")
-		.notNull()
-		.references(() => requirementSections.id, { onDelete: "cascade" }),
-	createdAt: timestamp("created_at").notNull().defaultNow(),
-	updatedAt: timestamp("updated_at").notNull(),
-});
+export const requirementQuestion = applicationSchema.table(
+	"requirement_question",
+	{
+		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
+		question: text("name").notNull(),
+		description: text("description").notNull(),
+		isRequired: boolean("is_required").notNull(),
+		placeholder: text("placeholder").notNull(),
+		defaultValue: text("default_value").notNull(),
+		component: requirementsComponentEnum("component").notNull(),
+		order: integer("order"),
+		allowMultiple: boolean("allow_multiple").notNull(),
+		requirementSectionId: uuid("requirement_section_id")
+			.notNull()
+			.references(() => requirementSections.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at").notNull(),
+	},
+);
 
 export const requirementAnswers = applicationSchema.table(
 	"requirement_answers",
 	{
 		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-		requirementChoiceAnswerId: uuid("requirement_choice_answer_id")
-			.references(() => requirementChoices.id, { onDelete: "set null" }),
+		requirementChoiceAnswerId: uuid("requirement_choice_answer_id").references(
+			() => requirementChoices.id,
+			{ onDelete: "set null" },
+		),
 		requirementsId: uuid("requirement_id")
 			.notNull()
 			.references(() => requirementQuestion.id, { onDelete: "cascade" }),
