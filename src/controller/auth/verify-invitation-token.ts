@@ -46,12 +46,10 @@ export async function verifyInvitationToken(
 			.from(invitedUsers)
 			.where(and(eq(invitedUsers.oneTimeTokensId, token[0].id)));
 
-		res
-			.status(200)
-			.json({
-				message: "The token successfully verified",
-				data: { invitedUsersId: invitedUserResult[0].invitedUsersId },
-			});
+		res.status(200).json({
+			message: "The token successfully verified",
+			data: { invitedUsersId: invitedUserResult[0].invitedUsersId },
+		});
 		return;
 	} catch (error) {
 		next(error);

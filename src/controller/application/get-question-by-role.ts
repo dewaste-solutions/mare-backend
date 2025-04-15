@@ -213,12 +213,21 @@ export const getQuestionByRole = async (
 			}>,
 		);
 
+		const totalPages = Math.ceil(totalCount / Number(limit));
+		const currentPage = Number(page);
+
 		res.status(200).json({
 			messages: "Successfully retrieved application questions",
 			data: {
 				count: totalCount,
-				next: "",
-				previous: "",
+				next:
+					currentPage < totalPages
+						? `/api/application/get-application-question?page=${currentPage + 1}&limit=${limit}`
+						: null,
+				previous:
+					currentPage > 1
+						? `/api/application/get-application-question?page=${currentPage - 1}&limit=${limit}`
+						: null,
 				result: nestedStructure,
 			},
 		});
