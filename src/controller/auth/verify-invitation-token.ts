@@ -2,6 +2,7 @@ import { and, eq, gt, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
 import { oneTimeTokens } from "../../db/schema/auth";
+import { invitedUsers } from "../../db/schema/application";
 
 export async function verifyInvitationToken(
 	req: Request,
@@ -40,7 +41,13 @@ export async function verifyInvitationToken(
 			.set({ updatedAt: sql`NOW()` })
 			.where(eq(oneTimeTokens.id, token[0].id));
 
-		res.status(204).end();
+		const invitedUserResult = await db.select({invitedUsersId: invitedUsers.id}).from(invitedUsers).where(
+			and(
+				eq(invitedUsers.oneTimeTokensId, token[0].id)
+			),
+		);
+
+		res.status(200).json({ message: "The token successfully verified", data: {invitedUsersId: invitedUserResult[0].invitedUsersId}  });
 		return;
 	} catch (error) {
 		next(error);
