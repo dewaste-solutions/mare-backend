@@ -115,7 +115,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 1.1,
 		allowMultiple: false,
 	},
 	{
@@ -127,7 +127,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 1.2,
 		allowMultiple: false,
 	},
 	{
@@ -139,7 +139,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: 1.3,
 		allowMultiple: false,
 	},
 	{
@@ -199,7 +199,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 3,
+		order: 3.1,
 		allowMultiple: false,
 	},
 	{
@@ -211,7 +211,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 3,
+		order: 3.2,
 		allowMultiple: false,
 	},
 	{
@@ -223,7 +223,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 3,
+		order: 3.3,
 		allowMultiple: false,
 	},
 	{
