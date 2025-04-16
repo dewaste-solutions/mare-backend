@@ -3,9 +3,8 @@ import { db } from "../src/db";
 export async function truncateAllTables() {
 	// Get all schemas except system schemas
 	const schemas = await db.execute(
-		`SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast')`,
+		`SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast', 'drizzle')`,
 	);
-
 	for (const { schema_name } of schemas.rows) {
 		// Get all tables in the schema
 		const tables = await db.execute(

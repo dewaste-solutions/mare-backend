@@ -116,7 +116,7 @@ export const requirementAnswers = applicationSchema.table(
 			() => requirementChoices.id,
 			{ onDelete: "set null" },
 		),
-		requirementsId: uuid("requirement_id")
+		requirementsQuestionId: uuid("requirement_question_id")
 			.notNull()
 			.references(() => requirementQuestion.id, { onDelete: "cascade" }),
 		onBoardingId: uuid("onboarding_id")
