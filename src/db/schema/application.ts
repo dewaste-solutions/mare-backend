@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
 	boolean,
 	integer,
+	numeric,
 	pgEnum,
 	pgSchema,
 	text,
@@ -98,7 +99,7 @@ export const requirementQuestion = applicationSchema.table(
 		placeholder: text("placeholder").notNull(),
 		defaultValue: text("default_value").notNull(),
 		component: requirementsComponentEnum("component").notNull(),
-		order: integer("order"),
+		order: numeric("order"),
 		allowMultiple: boolean("allow_multiple").notNull(),
 		requirementSectionId: uuid("requirement_section_id")
 			.notNull()

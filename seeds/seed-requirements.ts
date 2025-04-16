@@ -115,7 +115,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1.1,
+		order: "1.1",
 		allowMultiple: false,
 	},
 	{
@@ -127,7 +127,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1.2,
+		order: "1.2",
 		allowMultiple: false,
 	},
 	{
@@ -139,7 +139,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1.3,
+		order: "1.3",
 		allowMultiple: false,
 	},
 	{
@@ -151,7 +151,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "date" as const,
-		order: 2,
+		order: "2",
 		allowMultiple: false,
 	},
 	{
@@ -163,7 +163,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_email" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	},
 	{
@@ -175,7 +175,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	},
 	{
@@ -187,7 +187,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 2,
+		order: "2",
 		allowMultiple: false,
 	},
 	{
@@ -199,7 +199,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 3.1,
+		order: "3.1",
 		allowMultiple: false,
 	},
 	{
@@ -211,7 +211,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 3.2,
+		order: "3.2",
 		allowMultiple: false,
 	},
 	{
@@ -223,7 +223,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 3.3,
+		order: "3.3",
 		allowMultiple: false,
 	},
 	{
@@ -235,7 +235,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	},
 
@@ -248,7 +248,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "radiogroup" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	}, // choices
 	{
@@ -260,7 +260,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	},
 	{
@@ -273,7 +273,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 2,
+		order: "2",
 		allowMultiple: false,
 	},
 
@@ -286,7 +286,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "radiogroup" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	}, // choices
 	{
@@ -298,7 +298,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "radiogroup" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	}, // choices
 	{
@@ -310,7 +310,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "textarea" as const,
-		order: 2,
+		order: "2",
 		allowMultiple: false,
 	},
 
@@ -324,7 +324,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	},
 	{
@@ -337,7 +337,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "textarea" as const,
-		order: 2,
+		order: "2",
 		allowMultiple: false,
 	},
 	{
@@ -350,7 +350,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "input_text" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	},
 	{
@@ -363,7 +363,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "textarea" as const,
-		order: 2,
+		order: "2",
 		allowMultiple: false,
 	},
 
@@ -376,7 +376,7 @@ const franchiseQuestion = [
 		isRequired: true,
 		defaultValue: "",
 		component: "select_upload" as const,
-		order: 1,
+		order: "1",
 		allowMultiple: false,
 	}, // choices
 ];

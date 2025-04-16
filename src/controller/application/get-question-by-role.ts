@@ -202,7 +202,7 @@ export const getQuestionByRole = async (
 						placeholder: string;
 						defaultValue: string;
 						component: string;
-						order: number | null;
+						order: string | null; // this is numeric in database but becomes a string in typescript -> https://github.com/drizzle-team/drizzle-orm/issues/1042
 						allowMultiple: boolean;
 						choices?: Array<{
 							name: string;
