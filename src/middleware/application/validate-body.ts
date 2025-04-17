@@ -55,7 +55,7 @@ export async function validateApplicationSubmit(
 	}
 
 	const answerSchema = z.object({
-		requirementChoiceAnswerId: z.string().uuid().optional(),
+		requirementChoiceAnswerId: z.string().uuid().nullable(),
 		requirementsQuestionId: z.string().uuid(),
 		answer: z.string().default(""),
 	});
