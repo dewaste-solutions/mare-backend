@@ -4,7 +4,9 @@
 		"module": "CommonJS",
 		"esModuleInterop": true,
 		"outDir": "./dist",
-		"rootDir": ".",
-		"strict": true
-	}
+		"rootDir": "./src",
+		"strict": true,
+		"skipLibCheck": true
+	},
+	"exclude": ["drizzle.config.ts", "seeds"]
 }

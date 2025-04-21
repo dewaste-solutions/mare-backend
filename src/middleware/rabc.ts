@@ -1,13 +1,7 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db } from "../db";
-import {
-	permissions,
-	refreshTokens,
-	rolePermissionConnection,
-	roles,
-	sessions,
-} from "../db/schema/auth";
+import { refreshTokens, sessions } from "../db/schema/auth";
 import {
 	isAccessTokenValidated,
 	isRefreshTokenValidated,
@@ -17,105 +11,55 @@ import {
 // Common verbs include "read", "write", "create", "update", "delete", "approve", "invite",
 // Resources can include specific entities, data types, or functionalities (e.g., "users", "products", "orders", "settings").
 
-type checkPermissionsType = {
-	requiredPermissions: string[];
-	checkAccessToken?: boolean;
-};
-
-export const checkPermissions = ({
-	requiredPermissions,
-	checkAccessToken = true,
-}: checkPermissionsType) => {
+/**
+ * Middleware to enforce role-based access control (RBAC).
+ *
+ * - Validates the access token.
+ * - Validates the refresh token, including revocation status.
+ * - Confirms the user has the required permissions.
+ *
+ * @param requiredPermissions - List of required permission scopes (e.g., `["read:profile"]`).
+ * @returns Express middleware function that enforces RBAC.
+ *
+ * @example
+ * ```ts
+ * authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
+ * ```
+ */
+export const checkPermissions = (requiredPermissions: string[]) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const authHeader = req.headers.authorization;
-			let userPermissions: string[] = [];
-
-			const refreshTokenCookies = req.cookies.refreshToken;
-			const { decodedRefreshToken, isTokenValid } =
-				await isRefreshTokenValidated({
-					refreshToken: refreshTokenCookies,
-					returnDecoded: true,
-				});
-
-			if (!refreshTokenCookies || !isTokenValid) {
-				res.status(401).json({ message: "Unauthorized" });
+			const accessToken = authHeader?.split(" ")[1];
+			if (!accessToken) {
+				res.status(401).json({ message: "Unauthorized: Missing access token" });
 				return;
 			}
 
-			if (checkAccessToken) {
-				const accessToken = authHeader?.split(" ")[1];
-				if (!accessToken) {
-					res.status(500).json({ message: "Internal server error" });
-					return;
-				}
+			const { isTokenValid: isAccessTokenValid, decodedAccessToken } =
+				await isAccessTokenValidated({ accessToken, returnDecoded: true });
 
-				const { isTokenValid, decodedAccessToken } =
-					await isAccessTokenValidated({ accessToken, returnDecoded: true });
+			if (!isAccessTokenValid || !decodedAccessToken) {
+				res.status(401).json({ message: "Unauthorized: Invalid access token" });
+				return;
+			}
 
-				if (!isTokenValid || !decodedAccessToken) {
-					res.status(401).json({ message: "Unauthorized: Invalid token" });
-					return;
-				}
+			const refreshTokenCookies = req.cookies.refreshToken;
+			const { isTokenValid: isRefreshTokenValid } =
+				await isRefreshTokenValidated({
+					refreshToken: refreshTokenCookies,
+					returnDecoded: false,
+				});
 
-				if (
-					typeof decodedAccessToken !== "object" ||
-					decodedAccessToken === null
-				) {
-					res
-						.status(401)
-						.json({ message: "Unauthorized: Invalid token format" });
-					return;
-				}
-
-				if (!decodedAccessToken.permission) {
-					res
-						.status(401)
-						.json({ message: "Unauthorized: Invalid token format" });
-					return;
-				}
-
-				userPermissions = decodedAccessToken.permission;
-			} else {
-				if (
-					typeof decodedRefreshToken !== "object" ||
-					decodedRefreshToken === null
-				) {
-					res
-						.status(401)
-						.json({ message: "Unauthorized: Invalid token format" });
-					return;
-				}
-
-				if (!decodedRefreshToken.role) {
-					res
-						.status(401)
-						.json({ message: "Unauthorized: Invalid token format" });
-					return;
-				}
-
-				const permissionList = await db
-					.select({ scope: permissions.scope })
-					.from(rolePermissionConnection)
-					.innerJoin(roles, eq(rolePermissionConnection.roleId, roles.id))
-					.innerJoin(
-						permissions,
-						eq(rolePermissionConnection.permissionId, permissions.id),
-					)
-					.where(eq(roles.name, decodedRefreshToken.role));
-
-				if (permissionList.length === 0) {
-					res.status(500).json({ message: "Internal server error" });
-					return;
-				}
-				const permissionsArray = permissionList.map((p) => p.scope);
-
-				userPermissions = permissionsArray;
+			if (!refreshTokenCookies || !isRefreshTokenValid) {
+				res
+					.status(401)
+					.json({ message: "Unauthorized: Missing refresh token" });
+				return;
 			}
 
 			const sessionRecord = await db
 				.select({
-					notAfter: sessions.notAfter,
 					revoked: refreshTokens.revoked,
 					sessionId: refreshTokens.sessionId,
 				})
@@ -124,25 +68,21 @@ export const checkPermissions = ({
 				.where(eq(refreshTokens.token, refreshTokenCookies))
 				.limit(1);
 
-			const nowResult = await db.execute(
-				sql`SELECT NOW() AS current_timestamp`,
-			);
-			const now = new Date(nowResult.rows[0].current_timestamp);
-
 			if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
-				res.status(401).json({ message: "Unauthorized" });
+				res.status(401).json({ message: "Unauthorized: Invalid session" });
 				return;
 			}
 
-			const { notAfter } = sessionRecord[0];
-
-			if (notAfter < now) {
-				res
-					.status(401)
-					.json({ message: "Session expired, please log in again" });
+			if (
+				typeof decodedAccessToken !== "object" ||
+				decodedAccessToken === null ||
+				!decodedAccessToken.permission
+			) {
+				res.status(401).json({ message: "Unauthorized: Invalid token format" });
 				return;
 			}
 
+			const userPermissions: string[] = decodedAccessToken.permission;
 			const hasPermission = requiredPermissions.every((perm) =>
 				userPermissions.includes(perm),
 			);
@@ -155,8 +95,8 @@ export const checkPermissions = ({
 			}
 
 			next();
-		} catch (_error) {
-			res.status(500).json({ message: "Internal server error" });
+		} catch (error) {
+			next(error);
 		}
 	};
 };

@@ -2,6 +2,7 @@ import express from "express";
 import { createInvitationToken } from "../controller/auth/create-invitation-token";
 import { createUser } from "../controller/auth/create-user";
 import { getAccessToken } from "../controller/auth/get-access-token";
+import { getAllRoles } from "../controller/auth/get-all-roles";
 import { getProfile } from "../controller/auth/get-profile";
 import { signInUser } from "../controller/auth/signin-user";
 import { signoutUser } from "../controller/auth/signout-user";
@@ -21,28 +22,18 @@ authRoutes.post("/signin", validateAuthSignIn, signInUser);
 
 authRoutes.post("/signout", signoutUser);
 
-authRoutes.get(
-	"/profile",
-	checkPermissions({ requiredPermissions: ["read:profile"] }),
-	getProfile,
-);
+authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
 
-authRoutes.post(
-	"/renew-access-token",
-	checkPermissions({
-		requiredPermissions: ["generate:access-token"],
-		checkAccessToken: false,
-	}),
-	getAccessToken,
-);
+// getAccessToken also have checkPermissions generate:access-token
+authRoutes.post("/renew-access-token", getAccessToken);
 
 authRoutes.post(
 	"/generate-invitation",
-	checkPermissions({
-		requiredPermissions: ["create:invitation"],
-	}),
+	checkPermissions(["create:invitation"]),
 	validateAuthInvitation,
 	createInvitationToken,
 );
 
 authRoutes.post("/verify-invitation", verifyInvitationToken);
+
+authRoutes.get("/get-all-roles", checkPermissions(["read:roles"]), getAllRoles);
