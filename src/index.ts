@@ -8,6 +8,7 @@ import { httpLogger } from "./middleware/pino-logger";
 import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { authRoutes } from "./routes/auth-route";
 import { sharedRoute } from "./routes/shared-route";
+import { fileRoutes } from "./routes/file-route";
 
 const app = express();
 const PORT = env.BACKEND_PORT;
@@ -26,6 +27,7 @@ app.use(httpLogger());
 
 // PUT your api here and set a rate limit
 app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
+app.use("/api/files", applyRateLimit(RateLimitCategory.MODERATE), fileRoutes);
 app.use("/api/shared", applyRateLimit(RateLimitCategory.LENIENT), sharedRoute);
 
 app.use(notFoundLogger());
