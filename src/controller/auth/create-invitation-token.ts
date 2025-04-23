@@ -2,7 +2,9 @@ import crypto from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import { db } from "../../db";
+import { invitedUsers } from "../../db/schema/application";
 import { oneTimeTokens, roles } from "../../db/schema/auth";
+import { statuses } from "../../db/schema/shared";
 import { env } from "../../env";
 import { sendInvitationEmail } from "../../helper/nodemailer/template/invitation";
 
@@ -12,7 +14,7 @@ export async function createInvitationToken(
 	next: NextFunction,
 ) {
 	try {
-		const { roleId, emailTo } = req.body;
+		const { roleId, email } = req.body;
 
 		const token = crypto.randomBytes(32).toString("hex");
 
@@ -31,12 +33,27 @@ export async function createInvitationToken(
 				throw new Error("Invalid role ID.");
 			}
 
-			await tx.insert(oneTimeTokens).values({
-				tokenHash: hashedToken,
-				tokenType: "invitation",
-				metadata: { roleId },
+			const invitationResult = await tx
+				.insert(oneTimeTokens)
+				.values({
+					tokenHash: hashedToken,
+					tokenType: "invitation",
+					metadata: { roleId },
+					updatedAt: sql`NOW()`,
+					notAfter: sql`NOW() + INTERVAL '1 week'`,
+				})
+				.returning({ id: oneTimeTokens.id });
+
+			const statusResult = await tx
+				.select({ id: statuses.id })
+				.from(statuses)
+				.where(eq(statuses.name, "invited"));
+
+			await tx.insert(invitedUsers).values({
+				statusId: statusResult[0].id.toString(),
+				oneTimeTokensId: invitationResult[0].id,
+				email: email,
 				updatedAt: sql`NOW()`,
-				notAfter: sql`NOW() + INTERVAL '1 week'`,
 			});
 
 			roleName = roleResult[0]?.name ?? null;
@@ -44,7 +61,7 @@ export async function createInvitationToken(
 			await sendInvitationEmail({
 				invitationLink: `${env.BACKEND_FRONTEND_URL}/application?invitationToken=${hashedToken}`,
 				role: roleName,
-				to: emailTo,
+				to: email,
 			});
 		});
 
