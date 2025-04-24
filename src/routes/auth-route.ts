@@ -3,7 +3,6 @@ import { createInvitationToken } from "../controller/auth/create-invitation-toke
 import { createUser } from "../controller/auth/create-user";
 import { getAccessToken } from "../controller/auth/get-access-token";
 import { getAllRoles } from "../controller/auth/get-all-roles";
-import { getInvitedList } from "../controller/auth/get-invited-list";
 import { getProfile } from "../controller/auth/get-profile";
 import { signInUser } from "../controller/auth/signin-user";
 import { signoutUser } from "../controller/auth/signout-user";
@@ -39,8 +38,3 @@ authRoutes.post("/verify-invitation", verifyInvitationToken);
 
 authRoutes.get("/get-all-roles", checkPermissions(["read:roles"]), getAllRoles);
 
-authRoutes.get(
-	"/invited-list",
-	checkPermissions(["read:invited-list"]),
-	getInvitedList,
-);
