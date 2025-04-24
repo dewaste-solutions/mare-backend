@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { cloudinary } from "../../services/cloudinary.service";
 
 interface DeleteFileRequest extends Request {
@@ -7,7 +7,7 @@ interface DeleteFileRequest extends Request {
     };
 }
 
-export const deleteFile = async (req: DeleteFileRequest, res: Response): Promise<void> => {
+export const deleteFile = async (req: DeleteFileRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
         const public_id = req.query.public_id as string | undefined;
 
@@ -39,9 +39,6 @@ export const deleteFile = async (req: DeleteFileRequest, res: Response): Promise
             result
         });
     } catch (error) {
-        console.error("Error deleting file:", error);
-        res.status(500).json({
-            message: "Error deleting file"
-        });
-    }
+		next(error);
+	}
 };
