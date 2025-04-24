@@ -37,3 +37,4 @@ authRoutes.post(
 authRoutes.post("/verify-invitation", verifyInvitationToken);
 
 authRoutes.get("/get-all-roles", checkPermissions(["read:roles"]), getAllRoles);
+

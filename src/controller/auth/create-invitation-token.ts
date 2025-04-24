@@ -14,7 +14,7 @@ export async function createInvitationToken(
 	next: NextFunction,
 ) {
 	try {
-		const { roleId, emailTo } = req.body;
+		const { roleId, email } = req.body;
 
 		const token = crypto.randomBytes(32).toString("hex");
 
@@ -52,7 +52,7 @@ export async function createInvitationToken(
 			await tx.insert(invitedUsers).values({
 				statusId: statusResult[0].id.toString(),
 				oneTimeTokensId: invitationResult[0].id,
-				email: emailTo,
+				email: email,
 				updatedAt: sql`NOW()`,
 			});
 
@@ -61,7 +61,7 @@ export async function createInvitationToken(
 			await sendInvitationEmail({
 				invitationLink: `${env.BACKEND_FRONTEND_URL}/application?invitationToken=${hashedToken}`,
 				role: roleName,
-				to: emailTo,
+				to: email,
 			});
 		});
 
