@@ -8,4 +8,4 @@ export const fileRoutes = express.Router();
 fileRoutes.post("/upload", uploadFile);
 
 // File delete route - using * to capture the entire path including slashes and encoded characters
-fileRoutes.delete("/*", deleteFile);
+fileRoutes.delete("/delete", deleteFile);
