@@ -3,8 +3,8 @@ import cors from "cors";
 import express from "express";
 
 import { env } from "./env";
+import { httpLogger } from "./middleware/http-logger";
 import { notFoundLogger } from "./middleware/not-found-logger";
-import { httpLogger } from "./middleware/pino-logger";
 import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { applicationRoutes } from "./routes/application-route";
 import { authRoutes } from "./routes/auth-route";
