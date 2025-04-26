@@ -3,9 +3,10 @@ import cors from "cors";
 import express from "express";
 
 import { env } from "./env";
+import { httpLogger } from "./middleware/http-logger";
 import { notFoundLogger } from "./middleware/not-found-logger";
-import { httpLogger } from "./middleware/pino-logger";
 import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
+import { applicationRoutes } from "./routes/application-route";
 import { authRoutes } from "./routes/auth-route";
 import { sharedRoute } from "./routes/shared-route";
 
@@ -27,6 +28,11 @@ app.use(httpLogger());
 // PUT your api here and set a rate limit
 app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
 app.use("/api/shared", applyRateLimit(RateLimitCategory.LENIENT), sharedRoute);
+app.use(
+	"/api/application",
+	applyRateLimit(RateLimitCategory.LENIENT),
+	applicationRoutes,
+);
 
 app.use(notFoundLogger());
 

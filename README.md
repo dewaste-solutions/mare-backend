@@ -22,11 +22,7 @@ You can set up a PostgreSQL database using your preferred method:
 
 Using Docker (Optional):
 ```bash
-// make sure to copy the required environment variables for docker from env-sample
-
-docker compose up
-// to close the container
-docker compose down
+./start-database.sh
 ```
 
 Generate & Apply Migrations

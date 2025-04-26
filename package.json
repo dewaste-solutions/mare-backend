@@ -14,9 +14,11 @@
 		"db:check": "npx drizzle-kit check",
 		"db:up": "npx drizzle-kit up",
 		"seed": "ts-node seeds/seed.ts",
-		"biome": "npx @biomejs/biome check --write .",
+		"biome:write": "biome check --write .",
+		"biome:check": "biome check .",
 		"package:check": "npx npm-check-updates",
-		"package:upgrade": "npx npm-check-updates --interactive --format group"
+		"package:upgrade": "npx npm-check-updates --interactive --format group",
+		"package:unused": "npx depcheck"
 	},
 	"keywords": [],
 	"author": "",
@@ -26,7 +28,6 @@
 		"bcryptjs": "^3.0.2",
 		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.5",
-		"date-fns": "^4.1.0",
 		"dotenv": "^16.4.7",
 		"dotenv-expand": "^12.0.1",
 		"drizzle-orm": "^0.40.1",
@@ -36,6 +37,7 @@
 		"morgan": "^1.10.0",
 		"nodemailer": "^6.10.0",
 		"pg": "^8.14.1",
+		"winston": "^3.17.0",
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {
@@ -47,8 +49,8 @@
 		"@types/morgan": "^1.9.9",
 		"@types/node": "^22.14.0",
 		"@types/nodemailer": "^6.4.17",
-		"@types/pg": "^8.11.11",
-		"drizzle-kit": "^0.30.5",
+		"@types/pg": "^8.11.13",
+		"drizzle-kit": "^0.30.6",
 		"nodemon": "^3.1.9",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.2"
