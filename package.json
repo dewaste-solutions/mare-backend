@@ -14,7 +14,8 @@
 		"db:check": "npx drizzle-kit check",
 		"db:up": "npx drizzle-kit up",
 		"seed": "ts-node seeds/seed.ts",
-		"biome": "npx @biomejs/biome check --write .",
+		"biome:write": "biome check --write .",
+		"biome:check": "biome check .",
 		"package:check": "npx npm-check-updates",
 		"package:upgrade": "npx npm-check-updates --interactive --format group",
 		"package:unused": "npx depcheck"

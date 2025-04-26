@@ -21,5 +21,5 @@
     - Functions should only expose what they need.
 
 ## linting and formatting 
-- Always run `npm run biome` (not necessarily after every change, but always before pushing to GitHub).
+- Always run `npm run biome:write` (not necessarily after every change, but always before pushing to GitHub).
     - This ensures you catch errors early before GitHub Actions run.
