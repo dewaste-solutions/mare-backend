@@ -12,7 +12,7 @@ export const updateApplicationStatus = async (
 ): Promise<void> => {
     try {
         const onboardingId = req.query.onboardingId as string | undefined;
-        const { status } = req.body;
+        const status = req.query.status as string | undefined;
 
         if (!onboardingId) {
             res.status(400).json({ message: "onboardingId is required." });
