@@ -7,13 +7,13 @@ const app = express();
 // Use our env vars for setting credentials. 
 // Remove lines 11-14 if using ~/.aws/credentials file on a local server.
 aws.config.update({
-    accessKeyId: 'DO00LCPUACT3KCHEMPK2',
-    secretAccessKey: 'access-key-all-1745660679867',
+    accessKeyId: '',
+    secretAccessKey: '',
     region: 'sp1'
 });
 
 // Set S3 endpoint to DigitalOcean Spaces
-const spacesEndpoint = new aws.Endpoint('https://testing-dwsdb-56.sgp1.digitaloceanspaces.com');
+const spacesEndpoint = new aws.Endpoint('');
 const s3 = new aws.S3({
   endpoint: spacesEndpoint
 });
@@ -22,7 +22,7 @@ const s3 = new aws.S3({
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'testing-dwsdb-56',
+    bucket: '',
     acl: 'public-read',
     key: function (request, file, cb) {
       console.log(file);
