@@ -1,63 +1,118 @@
+// https://docs.digitalocean.com/reference/api/spaces/
+
+
 // Load dependencies
-const aws = require('aws-sdk');
-const express = require('express');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import express from 'express';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import 'dotenv/config';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
-// Use our env vars for setting credentials. 
-// Remove lines 11-14 if using ~/.aws/credentials file on a local server.
-aws.config.update({
-    accessKeyId: '',
-    secretAccessKey: '',
-    region: 'sp1'
+
+const s3Client = new S3Client({
+  endpoint: process.env.SPACES_ENDPOINT,
+  region: process.env.SPACES_REGION,
+  credentials: {
+    accessKeyId: process.env.SPACES_KEY,
+    secretAccessKey: process.env.SPACES_SECRET,
+  },
+  forcePathStyle: false,
 });
 
-// Set S3 endpoint to DigitalOcean Spaces
-const spacesEndpoint = new aws.Endpoint('');
-const s3 = new aws.S3({
-  endpoint: spacesEndpoint
-});
-
-// Change bucket property to your Space name
 const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: '',
-    acl: 'public-read',
-    key: function (request, file, cb) {
-      console.log(file);
-      cb(null, file.originalname);
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // file size limit
+  }
+}).single('upload');
+
+const uploadObject = async (file) => {
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const fileExtension = file.originalname.split('.').pop();
+  const newFilename = `${file.originalname.replace(`.${fileExtension}`, '')}_${timestamp}.${fileExtension}`;
+
+  const params = {
+    Bucket: "testing-dwsdb-56",
+    Key: newFilename,
+    Body: file.buffer,
+    ACL: "public-read", // private or public-read
+    ContentType: file.mimetype,
+    Metadata: {
+      "x-amz-meta-uploaded-by": "public", // or any other identifier
+      "x-amz-meta-original-filename": file.originalname,
+      "x-amz-meta-upload-date": new Date().toISOString(),
+      "x-amz-meta-file-type": file.mimetype,
+      "x-amz-meta-file-size": file.size.toString(),
+      "x-amz-meta-file-extension": file.originalname.split('.').pop(),
     }
-  })
-}).array('upload', 1);
+  };
+
+  try {
+    const data = await s3Client.send(new PutObjectCommand(params));
+
+    const fileUrl = `https://${params.Bucket}.${process.env.SPACES_ENDPOINT.replace('https://', '')}/${params.Key}`;
+
+    console.log(
+      "Successfully uploaded object: " +
+        params.Bucket +
+        "/" +
+        params.Key
+    );
+
+    console.log({data, fileUrl});
+
+    // return {
+    //   ...data,
+    //   fileUrl
+    // };
+  } catch (err) {
+    console.log("Error", err);
+    throw err;
+  }
+};
+
 
 // Views in public directory
 app.use(express.static('public'));
 
-// Main, error and success views
-app.get('/', function (request, response) {
+// Routes
+app.get('/', (_request, response) => {
   response.sendFile(__dirname + '/public/index.html');
 });
 
-app.get("/success", function (request, response) {
+app.get("/success", (request, response) => {
   response.sendFile(__dirname + '/public/success.html');
 });
 
-app.get("/error", function (request, response) {
+app.get("/error", (_request, response) => {
   response.sendFile(__dirname + '/public/error.html');
 });
 
-app.post('/upload', function (request, response, next) {
-  upload(request, response, function (error) {
+app.post('/upload', async (request, response, _next) => {
+  upload(request, response, async function (error) {
     if (error) {
       console.log(error);
       return response.redirect("/error");
     }
-    console.log('File uploaded successfully.');
-    response.redirect("/success");
+    try {
+      if (!request.file) {
+        throw new Error('No file uploaded');
+      }
+      await uploadObject(request.file);
+      console.log('File uploaded successfully.');
+      response.redirect("/success");
+    } catch (err) {
+      console.error('Upload error:', err);
+      response.redirect("/error");
+    }
   });
 });
 
-app.listen(3000, function () {
+app.listen(3000, () => {
   console.log('Server listening on port 3000.');
 });
