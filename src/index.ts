@@ -12,15 +12,14 @@ import { sharedRoute } from "./routes/shared-route";
 
 const app = express();
 const PORT = env.BACKEND_PORT;
-// app.use(
-// 	cors({
-// 	  origin: "http://localhost.com", // Replace with your frontend's origin
-// 	  methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
-// 	  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-// 	})
-// );
+app.use(
+	cors({
+		origin: env.BACKEND_FRONTEND_URL,
+		methods: ["GET", "POST", "PUT", "DELETE"],
+		credentials: true,
+	}),
+);
 
-app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(httpLogger());
