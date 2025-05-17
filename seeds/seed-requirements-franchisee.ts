@@ -447,20 +447,24 @@ const franchiseChoices = [
 		requirementQuestionId: "abcfa9ed-5e23-49f4-822c-51f0ebd56021",
 	},
 	{
-		name: "file 1",
+		name: "SEC Registrations",
 		requirementQuestionId: "5199da5f-0757-43de-8c1f-b47c2e389b17",
 	},
 	{
-		name: "file 2",
+		name: "DTI Registration",
 		requirementQuestionId: "5199da5f-0757-43de-8c1f-b47c2e389b17",
 	},
 	{
-		name: "file 3",
+		name: "BIR 2303",
+		requirementQuestionId: "5199da5f-0757-43de-8c1f-b47c2e389b17",
+	},
+	{
+		name: "PCNC registratio",
 		requirementQuestionId: "5199da5f-0757-43de-8c1f-b47c2e389b17",
 	},
 ];
 
-export async function seedRequirements() {
+export async function seedRequirementsFranchisee() {
 	// creating question
 	await db.transaction(async (tx) => {
 		// creating question for franchise
