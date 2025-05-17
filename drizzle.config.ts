@@ -2,6 +2,7 @@ import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 import type { Config } from "drizzle-kit";
 import { env } from "./src/env";
+import { formatCertificate } from "./src/helper/format-certificate";
 
 // biome-ignore lint/style/noDefaultExport: <explanation>
 export default defineConfig({
@@ -13,6 +14,17 @@ export default defineConfig({
 	],
 	dialect: "postgresql",
 	dbCredentials: {
-		url: env.DATABASE_URL,
+		database: env.DATABASE_NAME,
+		user: env.DATABASE_USER,
+		password: env.DATABASE_PASSWORD,
+		host: env.DATABASE_HOST,
+		port: env.DATABASE_PORT,
+		ssl:
+			env.CA_CERT !== ""
+				? {
+						rejectUnauthorized: true,
+						ca: formatCertificate(env.CA_CERT),
+					}
+				: false,
 	},
 } satisfies Config);
