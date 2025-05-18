@@ -30,7 +30,7 @@ data "digitalocean_spaces_bucket" "bucket" {
 }
 
 resource "digitalocean_spaces_key" "mare-bucket-spaces-key" {
-  name = "mare-bucket-spaces-key"
+  name = "mare-bucket-spaces-key-dev"
   grant {
     bucket = data.digitalocean_spaces_bucket.bucket.name
     permission = "readwrite" 
