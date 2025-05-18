@@ -54,7 +54,6 @@ BACKEND_NODEMAILER_EMAIL="xxx"
 BACKEND_NODEMAILER_PASS="xxx"
 BACKEND_NODEMAILER_SERVICE="gmail"
 BACKEND_FRONTEND_URL="xxx"
-CA_CERT=""
 ```
 
 4. Initialize Terraform:
@@ -72,61 +71,7 @@ terraform plan
 terraform apply
 ```
 
-7. Setting up SSL Certificate for Database Connection
-
-### Download and Format Certificate
-1. Download the CA certificate from your DigitalOcean database dashboard
-2. Save it as `ca-certificate.crt`
-3. Convert the certificate to a single line format using one of these methods:
-
-**Using Bash/Git Bash:**
-```bash
-cat ca-certificate.crt | awk '{printf "%s\\n", $0}' | tr -d '\n'
-```
-
-**Using PowerShell:**
-```powershell
-(Get-Content ca-certificate.crt -Raw) -replace "`r`n", "\n" -replace "`n", "\n"
-```
-
-### Update App Platform Configuration
-1. Copy the converted certificate string
-2. Go to your DigitalOcean App Platform dashboard
-3. Navigate to your app's Environment Variables
-4. Find or create the `CA_CERT` variable
-5. Paste the converted certificate string as the value
-6. Save the changes
-7. Restart your application to apply the new certificate
-
-### Verify Connection
-- Check your application logs to ensure the database connection is successful
-- Test your application's database-dependent features
-
-
-## Managing Infrastructure
-
-### Creating Resources
-```sh
-terraform apply
-```
-
-### Updating Resources
-1. Make changes to the terraform files
-2. Run:
-```sh
-terraform plan
-terraform apply
-```
-
 ### Destroying Resources
 ```sh
 terraform destroy
 ```
-
-## Important Notes
-
-- Always review the plan output before applying changes
-- Keep your DigitalOcean API token secure and never commit it to version control
-- Use terraform workspaces if you need to manage multiple instances of the same environment
-- Make sure to back up your Terraform state files
-- In App Platform, when you change the environment variable, it will force a redeployment
