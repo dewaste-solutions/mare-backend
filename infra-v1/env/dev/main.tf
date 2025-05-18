@@ -23,6 +23,24 @@ resource "digitalocean_spaces_bucket" "bucket" {
   acl = var.digitalocean_spaces_bucket_acl
 }
 
+data "digitalocean_spaces_bucket" "bucket" {
+  name   = var.digitalocean_spaces_bucket_name
+  region = var.digitalocean_region
+  depends_on = [digitalocean_spaces_bucket.bucket]
+}
+
+resource "digitalocean_spaces_key" "mare-bucket-spaces-key" {
+  name = "mare-bucket-spaces-key"
+  grant {
+    bucket = data.digitalocean_spaces_bucket.bucket.name
+    permission = "readwrite" 
+      # this is weird, readwrite = read, write, delete
+      # fullaccess = doesnt work
+  }
+
+  depends_on = [ digitalocean_spaces_bucket.bucket ]
+}
+
 # Create App Platform
 resource "digitalocean_app" "mare-backend" {
   spec {
@@ -87,6 +105,22 @@ resource "digitalocean_app" "mare-backend" {
     env {
       key = "CA_CERT"
       value = replace(data.digitalocean_database_ca.ca.certificate, "\n", "\\n")
+    }
+    env {
+      key = "SPACES_KEY"
+      value = digitalocean_spaces_key.mare-bucket-spaces-key.id
+    }
+    env {
+      key = "SPACES_SECRET"
+      value = digitalocean_spaces_key.mare-bucket-spaces-key.secret_key
+    }
+    env {
+      key = "SPACES_ENDPOINT"
+      value = "https://${data.digitalocean_spaces_bucket.bucket.endpoint}"
+    }
+    env {
+      key = "SPACES_REGION"
+      value = data.digitalocean_spaces_bucket.bucket.region
     }
 
     job {
