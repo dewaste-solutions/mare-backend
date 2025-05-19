@@ -10,7 +10,7 @@ import {
 } from "../../db/schema/application";
 import { oneTimeTokens } from "../../db/schema/auth";
 
-export const getQuestionByRole = async (
+export const getQuestionByApplication = async (
 	req: Request,
 	res: Response,
 	next: NextFunction,
