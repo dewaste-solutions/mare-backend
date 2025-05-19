@@ -30,7 +30,7 @@ type QuestionType = {
 			placeholder: string;
 			defaultValue: string;
 			component: ComponentType;
-			order: string;
+			questionOrder: string;
 			allowMultiple: boolean;
 			choices: {
 				choicesName: string;
@@ -112,7 +112,7 @@ export const createQuestionByRole = async (
 											placeholder: question.placeholder,
 											defaultValue: question.defaultValue,
 											component: question.component,
-											order: question.order,
+											order: question.questionOrder,
 											allowMultiple: question.allowMultiple,
 											requirementSectionId: sectionResult[0].id,
 											updatedAt: sql`NOW()`,

@@ -47,7 +47,7 @@ const QuestionSchema = z.object({
 						"date",
 						"select_upload",
 					]),
-					order: z.string(),
+					questionOrder: z.string(),
 					allowMultiple: z.boolean(),
 					choices: z.array(
 						z.object({
