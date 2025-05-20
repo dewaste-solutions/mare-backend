@@ -49,10 +49,6 @@ export const getAccessToken = async (
 		const existingUser = await db
 			.select({
 				id: users.id,
-				firstName: users.firstName,
-				lastName: users.lastName,
-				email: users.email,
-				role: roles.name,
 				roleId: users.roleId,
 			})
 			.from(users)
@@ -91,10 +87,7 @@ export const getAccessToken = async (
 		// Generate new access token
 		const accessToken = jwt.sign(
 			{
-				email: existingUser[0].email,
-				firstName: existingUser[0].firstName,
-				lastName: existingUser[0].lastName,
-				role: existingUser[0].role,
+				userId: existingUser[0].id,
 				permission: permissionsArray,
 			},
 			privateKey,
