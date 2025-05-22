@@ -27,6 +27,17 @@ export const submitApplication = async (
 			return;
 		}
 
+		const existingApplication = await db
+			.select({ id: onBoarding.id })
+			.from(onBoarding)
+			.where(eq(onBoarding.invitedUsersId, userInvitedId))
+			.limit(1);
+
+		if (existingApplication.length > 0) {
+			res.status(400).json({ message: "You have already submitted an application." });
+			return;
+		}
+
 		await db.transaction(async (tx) => {
 			const statusResult = await tx
 				.select({ id: statuses.id })
