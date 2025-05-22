@@ -53,6 +53,11 @@ export async function seedAuthRole() {
 				scope: "update:status",
 				updatedAt: sql`NOW()`,
 			},
+			{
+				description: "Can read application details",
+				scope: "read:application",
+				updatedAt: sql`NOW()`,
+			},
 		]);
 
 		const insertedPermissions = await tx.select().from(permissions);
@@ -74,7 +79,13 @@ export async function seedAuthRole() {
 
 		// Assign admin-only permission
 		if (roleMap.admin) {
-			const adminOnlyPermissions = ["create:invitation", "read:roles", "read:invited-list", "update:status"];
+			const adminOnlyPermissions = [
+				"create:invitation",
+				"read:roles",
+				"read:invited-list",
+				"update:status",
+				"read:application",
+			];
 
 			const adminRolePermissions = adminOnlyPermissions.map((scope) => ({
 				roleId: roleMap.admin,
