@@ -1,105 +1,64 @@
-import path from "node:path";
-import type { NextFunction, Request, Response } from "express";
-import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { cloudinary } from "../../services/cloudinary.service";
+import { Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 
-interface CloudinaryStorageParams {
-	folder: string;
-	resource_type: string;
-	public_id: (req: Request, file: Express.Multer.File) => string;
-	filename: (req: Request, file: Express.Multer.File) => string;
-}
+export const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/png"
+] as const;
 
-const ALLOWED_FILE_TYPES = [
-	"application/pdf",
-	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-	"image/jpeg",
-  	"image/png"
-];
-const ALLOWED_FILE_EXTENSIONS = [".pdf", ".docx", ".png", ".jpeg", ".jpg"];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+type AllowedFileType = typeof ALLOWED_FILE_TYPES[number];
 
-// Configure Cloudinary storage
-const storage = new CloudinaryStorage({
-	cloudinary: cloudinary,
-	params: {
-		folder: "file-uploads",
-		resource_type: "auto",
-		public_id: (_req: Request, file: Express.Multer.File) => {
-			// Use the original filename without extension as the public_id
-			const fileNameWithoutExt = path.parse(file.originalname).name;
-			return `${fileNameWithoutExt}-${Date.now()}`;
-		},
-		filename: (_req: Request, file: Express.Multer.File) => {
-			// Return the original filename directly
-			return file.originalname;
-		},
-	} as CloudinaryStorageParams,
-});
-
-// File filter to check file types
-const fileFilter = (
-	_req: Request,
-	file: Express.Multer.File,
-	cb: multer.FileFilterCallback,
-) => {
-	const ext = path.extname(file.originalname).toLowerCase();
-
-	if (
-		ALLOWED_FILE_TYPES.includes(file.mimetype) &&
-		ALLOWED_FILE_EXTENSIONS.includes(ext)
-	) {
-		cb(null, true);
-	} else {
-		cb(new Error("Invalid file type. Only PDF, DOCX, JPEG, PNG files are allowed."));
-	}
-};
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
 // Configure multer
 const upload = multer({
-	storage: storage,
-	fileFilter: fileFilter,
-	limits: {
-		fileSize: MAX_FILE_SIZE, // 5MB max file size
-	},
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: MAX_FILE_SIZE,
+    files: 5, // Maximum number of files allowed
+  },
 });
 
-// Create a wrapper function for the upload middleware with error handling
-const uploadfiles = (fieldName: string) => {
-	return (req: Request, res: Response, next: NextFunction) => {
-		const uploadHandler = upload.single(fieldName);
-
-		uploadHandler(req, res, (err) => {
-			if (err instanceof multer.MulterError) {
-				// Handle Multer errors
-				if (err.code === "LIMIT_FILE_SIZE") {
-					return res.status(400).json({
-						message: "Invalid file size. 5mb max",
-					});
-				}
-				return res.status(400).json({
-					message: err.message || "Error uploading file",
-				});
-			}
-
-			if (err) {
-				// Handle custom errors from fileFilter
-				if (err.message.includes("Invalid file type")) {
-					return res.status(400).json({
-						message: "Invalid file type. Only PDF, DOCX, JPEG, PNG files are allowed.",
-					});
-				}
-				// Handle unexpected errors
-				return res.status(500).json({
-					message: "Internal server error",
-				});
-			}
-
-			// No errors, proceed to the next middleware
-			next();
-		});
-	};
+// Export multer middleware with error handling
+export const uploadMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  upload.array('files', 5)(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        res.status(400).json({
+          error: 'Invalid file size 5mb max per file.'
+        });
+        return;
+      }
+      if (err.code === 'LIMIT_FILE_COUNT') {
+        res.status(400).json({
+          error: 'Too many files. Maximum 5 files allowed.'
+        });
+        return;
+      }
+    }
+    next(err);
+  });
 };
 
-export { uploadfiles };
+export const validateFile = (req: Request, res: Response, next: NextFunction): void => {
+  if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+    res.status(400).json({
+      error: 'No files uploaded'
+    });
+    return;
+  }
+
+  // Check file types for all files
+  const invalidFiles = req.files.filter(file => !ALLOWED_FILE_TYPES.includes(file.mimetype as AllowedFileType));
+  if (invalidFiles.length > 0) {
+    res.status(400).json({
+      error: 'Invalid file type. Only PNG, JPEG, PDF and DOCX files are allowed.',
+      invalidFiles: invalidFiles.map(file => file.originalname)
+    });
+    return;
+  }
+
+  next();
+}; 
