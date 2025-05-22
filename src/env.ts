@@ -25,10 +25,11 @@ const EnvSchema = z.object({
 	BACKEND_NODEMAILER_SERVICE: z.string(),
 	BACKEND_FRONTEND_URL: z.string().url(),
 	BASE_URL: z.string().url(),
-	CLOUDINARY_CLOUD_NAME: z.string(),
-	CLOUDINARY_API_KEY: z.string(),
-	CLOUDINARY_API_SECRET: z.string(),
-	URL_DOCS_VIEWER: z.string().url(),
+	DO_SPACES_KEY: z.string(),
+	DO_SPACES_SECRET: z.string(),
+	DO_SPACES_ENDPOINT: z.string().url(),
+	DO_SPACES_BUCKET: z.string(),
+	DO_SPACES_REGION: z.string(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
