@@ -9,6 +9,16 @@ import {
     requirementCategories,
 } from "../../db/schema/application";
 
+// Helper function to convert string to camelCase
+const toCamelCase = (str: string): string => {
+    return str
+        .toLowerCase()
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+            return index === 0 ? word.toLowerCase() : word.toUpperCase();
+        })
+        .replace(/\s+/g, '');
+};
+
 export const getApplicationDetailsById = async (
     req: Request,
     res: Response,
@@ -54,9 +64,9 @@ export const getApplicationDetailsById = async (
             .where(eq(requirementAnswers.onBoardingId, onboardingId))
             .orderBy(requirementCategories.requirementStep);
 
-        // Organize answers by section
+        // Organize answers by section with camelCase keys
         const organizedAnswers = answers.reduce((acc, answer) => {
-            const sectionName = answer.sectionName;
+            const sectionName = toCamelCase(answer.sectionName);
 
             if (!acc[sectionName]) {
                 acc[sectionName] = [];
