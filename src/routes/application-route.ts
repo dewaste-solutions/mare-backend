@@ -6,6 +6,7 @@ import {
 	validateApplicationSubmit,
 	validateCreateQuestionByRole,
 } from "../middleware/application/validate-body";
+import { checkPermissions } from "../middleware/rabc";
 
 export const applicationRoutes = express.Router();
 
@@ -17,6 +18,7 @@ applicationRoutes.post(
 );
 applicationRoutes.post(
 	"/create-question-by-role",
+	checkPermissions(["create:application-question"]),
 	validateCreateQuestionByRole,
 	createQuestionByRole,
 );
