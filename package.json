@@ -38,7 +38,8 @@
 		"nodemailer": "^6.10.0",
 		"pg": "^8.14.1",
 		"winston": "^3.17.0",
-		"zod": "^3.24.2"
+		"zod": "^3.24.2",
+		"drizzle-kit": "^0.30.6"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -50,9 +51,11 @@
 		"@types/node": "^22.14.0",
 		"@types/nodemailer": "^6.4.17",
 		"@types/pg": "^8.11.13",
-		"drizzle-kit": "^0.30.6",
 		"nodemon": "^3.1.9",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.8.2"
+	},
+	"engines": {
+		"node": "~22"
 	}
 }

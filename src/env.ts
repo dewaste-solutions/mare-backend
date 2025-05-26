@@ -15,8 +15,13 @@ expand(
 
 const EnvSchema = z.object({
 	NODE_ENV: z.string(),
-	BACKEND_PORT: z.coerce.number().default(6000),
-	DATABASE_URL: z.string(),
+	BACKEND_PORT: z.coerce.number().default(8080),
+	DATABASE_NAME: z.string(),
+	DATABASE_PASSWORD: z.string(),
+	DATABASE_HOST: z.string(),
+	DATABASE_PORT: z.coerce.number(),
+	DATABASE_USER: z.string(),
+	CA_CERT: z.string(),
 	BACKEND_AUTH_PRIVATE_KEY: z.string(),
 	BACKEND_NODEMAILER_HOST: z.string(),
 	BACKEND_NODEMAILER_PORT: z.coerce.number().default(587),
@@ -24,6 +29,10 @@ const EnvSchema = z.object({
 	BACKEND_NODEMAILER_PASS: z.string(),
 	BACKEND_NODEMAILER_SERVICE: z.string(),
 	BACKEND_FRONTEND_URL: z.string().url(),
+	SPACES_KEY: z.string(),
+	SPACES_SECRET: z.string(),
+	SPACES_ENDPOINT: z.string().url(),
+	SPACES_REGION: z.string(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

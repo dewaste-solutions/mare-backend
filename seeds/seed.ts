@@ -2,7 +2,7 @@ import { env } from "../src/env";
 import { logger } from "../src/helper/logger";
 import { seedAuthAccount } from "./seed-auth-account";
 import { seedAuthRole } from "./seed-auth-role";
-import { seedRequirements } from "./seed-requirements";
+import { seedRequirementsFranchisee } from "./seed-requirements-franchisee";
 import { seedStatuses } from "./seed-statuses";
 import { truncateAllTables } from "./truncate-all-tables";
 import { tryCatch } from "./tryCatch";
@@ -48,7 +48,9 @@ import { tryCatch } from "./tryCatch";
 		})),
 	);
 
-	const { error: seedRequirementsError } = await tryCatch(seedRequirements());
+	const { error: seedRequirementsError } = await tryCatch(
+		seedRequirementsFranchisee(),
+	);
 	if (seedRequirementsError) {
 		logger.error(seedRequirementsError);
 		process.exit(1);

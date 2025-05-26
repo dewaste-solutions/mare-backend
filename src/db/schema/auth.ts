@@ -87,18 +87,9 @@ export const oneTimeTokens = authSchema.table("one_time_tokens", {
 	updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const userRoleEnum = pgEnum("user_role_enum", [
-	"admin",
-	"guest",
-	"franchise",
-	"worker",
-	"manager",
-	"community",
-]);
-
 export const roles = authSchema.table("roles", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-	name: userRoleEnum("name").notNull().unique(),
+	name: text("name").notNull().unique(),
 
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull(),

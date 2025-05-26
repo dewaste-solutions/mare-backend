@@ -22,7 +22,7 @@ export const invitedUsers = applicationSchema.table("invited_users", {
 	oneTimeTokensId: uuid("one_time_tokens_id")
 		.notNull()
 		.references(() => oneTimeTokens.id, { onDelete: "cascade" }),
-	email: text("email").notNull(),
+	email: text("email").notNull().unique(),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
