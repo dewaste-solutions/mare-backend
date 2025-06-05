@@ -1,0 +1,38 @@
+name: Database Schema Check
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22
+      
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+
+      - name: Check Schema Changes
+        run: npm run db:check-schema
+        env: 
+            NODE_ENV: development
+            DATABASE_NAME: mare
+            DATABASE_PASSWORD: yourpassword
+            DATABASE_HOST: localhost
+            DATABASE_PORT: 5432
+            DATABASE_USER: postgres
+            BACKEND_PORT: 8080
+            CA_CERT: 
+            BACKEND_AUTH_PRIVATE_KEY: 7bda7c98c976167e79e87f67683d92e6419aafc1ff4a93d03430480441ab34a7
+            BACKEND_NODEMAILER_HOST: smtp.gmail.com
+            BACKEND_NODEMAILER_PORT: 587
+            BACKEND_NODEMAILER_EMAIL: sample@gmail.com
+            BACKEND_NODEMAILER_PASS: sample
+            BACKEND_NODEMAILER_SERVICE: gmail
+            BACKEND_FRONTEND_URL: http://www.sample.com
+            SPACES_KEY: sample
+            SPACES_SECRET: sample
+            SPACES_ENDPOINT: http://www.sample.com
+            SPACES_REGION: sample
