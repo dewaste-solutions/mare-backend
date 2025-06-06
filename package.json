@@ -15,7 +15,8 @@
 		"biome:check": "biome check .",
 		"package:check": "npx npm-check-updates",
 		"package:upgrade": "npx npm-check-updates --interactive --format group",
-		"package:unused": "npx depcheck"
+		"package:unused": "npx depcheck",
+		"db:check-schema": "./check-schema.sh"
 	},
 	"keywords": [],
 	"author": "",
