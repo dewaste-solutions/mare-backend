@@ -1,5 +1,7 @@
 import { eq, inArray, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import {
 	invitedUsers,
@@ -10,7 +12,7 @@ import {
 } from "../../db/schema/application";
 import { oneTimeTokens } from "../../db/schema/auth";
 
-export const getQuestionByApplication = async (
+export const getQuestionByRole = async (
 	req: Request,
 	res: Response,
 	next: NextFunction,
@@ -20,15 +22,21 @@ export const getQuestionByApplication = async (
 		const page = req.query.page as number | undefined;
 		const limit = req.query.limit as number | undefined;
 		if (!userInvitedId) {
-			res.status(400).json({ message: "userInvitedId is required." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 		if (!page) {
-			res.status(400).json({ message: "page is required." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 		if (!limit) {
-			res.status(400).json({ message: "limit is required." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 		const offset = (Number(page) - 1) * Number(limit) || 0;
@@ -45,7 +53,9 @@ export const getQuestionByApplication = async (
 		const roleIdString = JSON.stringify(metadata);
 		const roleIdParsed = JSON.parse(roleIdString);
 		if (!roleIdParsed.roleId) {
-			res.status(400).json({ message: "roleId not found." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 
@@ -216,8 +226,8 @@ export const getQuestionByApplication = async (
 		const totalPages = Math.ceil(totalCount / Number(limit));
 		const currentPage = Number(page);
 
-		res.status(200).json({
-			messages: "Successfully retrieved application questions",
+		res.status(HttpStatusCodes.OK).json({
+			messages: HttpStatusPhrases.OK,
 			data: {
 				count: totalCount,
 				next:

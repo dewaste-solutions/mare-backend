@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { roles, users } from "../../db/schema/auth";
 
@@ -19,14 +21,16 @@ export async function createUser(
 			.limit(1);
 		if (existingUser.length > 0) {
 			res
-				.status(409)
-				.json({ message: "An account with this email already exists" });
+				.status(HttpStatusCodes.CONFLICT)
+				.json({ message: HttpStatusPhrases.CONFLICT });
 			return;
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 		if (!hashedPassword) {
-			res.status(500).json({ message: "Internal server error" });
+			res
+				.status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ message: HttpStatusPhrases.INTERNAL_SERVER_ERROR });
 			return;
 		}
 
@@ -36,7 +40,9 @@ export async function createUser(
 			.where(eq(roles.name, "guest"))
 			.limit(1);
 		if (role.length === 0) {
-			res.status(404).json({ message: "Guest role not found in the system" });
+			res
+				.status(HttpStatusCodes.NOT_FOUND)
+				.json({ message: HttpStatusPhrases.NOT_FOUND });
 			return;
 		}
 
@@ -60,11 +66,15 @@ export async function createUser(
 				role_id: users.roleId,
 			});
 		if (newUser.length === 0) {
-			res.status(500).json({ message: "Internal server error" });
+			res
+				.status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ message: HttpStatusPhrases.INTERNAL_SERVER_ERROR });
 			return;
 		}
 
-		res.status(201).json({ message: "User created successfully" });
+		res
+			.status(HttpStatusCodes.CREATED)
+			.json({ message: HttpStatusPhrases.CREATED });
 		return;
 	} catch (error) {
 		next(error);
