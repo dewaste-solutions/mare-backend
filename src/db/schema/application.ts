@@ -65,7 +65,7 @@ export const requirementSections = applicationSchema.table(
 	"requirement_sections",
 	{
 		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-		name: text("name").notNull().unique(),
+		name: text("name").notNull(),
 		order: integer("order").notNull(),
 		requirementCategoryId: uuid("requirement_category_id")
 			.notNull()
@@ -79,7 +79,7 @@ export const requirementCategories = applicationSchema.table(
 	"requirement_categories",
 	{
 		id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
-		name: text("name").notNull().unique(),
+		name: text("name").notNull(),
 		requirementStep: integer("requirement_step").notNull(),
 		roleId: uuid("role_id")
 			.notNull()

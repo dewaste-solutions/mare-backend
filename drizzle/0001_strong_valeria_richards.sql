@@ -1,0 +1,2 @@
+ALTER TABLE "application"."requirement_categories" DROP CONSTRAINT "requirement_categories_name_unique";--> statement-breakpoint
+ALTER TABLE "application"."requirement_sections" DROP CONSTRAINT "requirement_sections_name_unique";
