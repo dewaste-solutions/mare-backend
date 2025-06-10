@@ -1,6 +1,6 @@
 import express from "express";
 import { createQuestionByRole } from "../controller/application/create-question-by-role";
-import { getQuestionByApplication } from "../controller/application/get-question-by-application";
+import { getQuestionByRole } from "../controller/application/get-question-by-application";
 import { submitApplication } from "../controller/application/submit-application";
 import {
 	validateApplicationSubmit,
@@ -10,7 +10,7 @@ import { checkPermissions } from "../middleware/rabc";
 
 export const applicationRoutes = express.Router();
 
-applicationRoutes.get("/get-application-question", getQuestionByApplication);
+applicationRoutes.get("/get-application-question", getQuestionByRole);
 applicationRoutes.post(
 	"/submit-application",
 	validateApplicationSubmit,

@@ -1,5 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { refreshTokens, roles, sessions, users } from "../../db/schema/auth";
 
@@ -23,7 +25,9 @@ export const getProfile = async (
 			.limit(1);
 
 		if (record.length === 0) {
-			res.status(401).json({ message: "Unauthorized" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -42,13 +46,15 @@ export const getProfile = async (
 			.limit(1);
 
 		if (userProfile.length === 0) {
-			res.status(404).json({ message: "User not found" });
+			res
+				.status(HttpStatusCodes.NOT_FOUND)
+				.json({ message: HttpStatusPhrases.NOT_FOUND });
 			return;
 		}
 
 		res
-			.status(200)
-			.json({ message: "Profile fetched successfully", data: userProfile[0] });
+			.status(HttpStatusCodes.OK)
+			.json({ message: HttpStatusPhrases.OK, data: userProfile[0] });
 		return;
 	} catch (error) {
 		next(error);

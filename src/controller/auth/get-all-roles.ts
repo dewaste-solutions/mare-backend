@@ -1,4 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { roles } from "../../db/schema/auth";
 
@@ -13,8 +15,8 @@ export const getAllRoles = async (
 			.from(roles);
 
 		res
-			.status(200)
-			.json({ message: "Roles fetched successfully", data: allRoles });
+			.status(HttpStatusCodes.OK)
+			.json({ message: HttpStatusPhrases.OK, data: allRoles });
 		return;
 	} catch (error) {
 		next(error);

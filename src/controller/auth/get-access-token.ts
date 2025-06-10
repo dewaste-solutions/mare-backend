@@ -1,6 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import {
 	permissions,
@@ -25,7 +27,9 @@ export const getAccessToken = async (
 			returnDecoded: false,
 		});
 		if (!refreshTokenCookies || !isTokenValid) {
-			res.status(401).json({ message: "Unauthorized" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -41,7 +45,9 @@ export const getAccessToken = async (
 			.limit(1);
 
 		if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
-			res.status(401).json({ message: "Unauthorized" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -57,7 +63,9 @@ export const getAccessToken = async (
 			.limit(1);
 
 		if (existingUser.length === 0) {
-			res.status(401).json({ message: "Unauthorized" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -71,14 +79,18 @@ export const getAccessToken = async (
 			.where(eq(rolePermissionConnection.roleId, existingUser[0].roleId));
 
 		if (permissionList.length === 0) {
-			res.status(403).json({ message: "Forbidden: Insufficient permissions" });
+			res
+				.status(HttpStatusCodes.FORBIDDEN)
+				.json({ message: HttpStatusPhrases.FORBIDDEN });
 			return;
 		}
 
 		const permissionsArray = permissionList.map((p) => p.scope);
 		const hasPermission = permissionsArray.includes("generate:access-token");
 		if (!hasPermission) {
-			res.status(403).json({ message: "Forbidden: Insufficient permissions" });
+			res
+				.status(HttpStatusCodes.FORBIDDEN)
+				.json({ message: HttpStatusPhrases.FORBIDDEN });
 			return;
 		}
 
@@ -94,8 +106,8 @@ export const getAccessToken = async (
 			{ expiresIn: "1d", algorithm: "HS256" },
 		);
 
-		res.status(200).json({
-			message: "Access token generated successfully",
+		res.status(HttpStatusCodes.OK).json({
+			message: HttpStatusPhrases.OK,
 			data: accessToken,
 		});
 	} catch (error) {

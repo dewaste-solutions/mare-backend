@@ -1,5 +1,7 @@
 import { and, eq, gt, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { invitedUsers } from "../../db/schema/application";
 import { oneTimeTokens } from "../../db/schema/auth";
@@ -13,7 +15,9 @@ export async function verifyInvitationToken(
 		const invitationToken = req.query.invitationToken as string | undefined;
 
 		if (!invitationToken) {
-			res.status(400).json({ message: "Token hash is required." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 
@@ -32,7 +36,9 @@ export async function verifyInvitationToken(
 			.limit(1);
 
 		if (token.length === 0 || token[0].revoked) {
-			res.status(401).json({ message: "Invalid or expired token." });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -46,8 +52,8 @@ export async function verifyInvitationToken(
 			.from(invitedUsers)
 			.where(and(eq(invitedUsers.oneTimeTokensId, token[0].id)));
 
-		res.status(200).json({
-			message: "The token successfully verified",
+		res.status(HttpStatusCodes.OK).json({
+			message: HttpStatusPhrases.OK,
 			data: { invitedUsersId: invitedUserResult[0].invitedUsersId },
 		});
 		return;

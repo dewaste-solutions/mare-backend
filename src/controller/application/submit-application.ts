@@ -1,12 +1,10 @@
 import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { onBoarding, requirementAnswers } from "../../db/schema/application";
 import { statuses } from "../../db/schema/shared";
-
-// requirementChoiceAnswerId: z.string().uuid().optional(),
-//     requirementsId: z.string().uuid(),
-//     answer: z.string().default(""),
 
 type AnswerInputType = {
 	requirementChoiceAnswerId?: string;
@@ -23,7 +21,9 @@ export const submitApplication = async (
 		const { answers } = req.body as { answers: AnswerInputType[] };
 		const userInvitedId = req.query.userInvitedId as string | undefined;
 		if (!userInvitedId) {
-			res.status(400).json({ message: "userInvitedId is required." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 
@@ -53,7 +53,9 @@ export const submitApplication = async (
 			await tx.insert(requirementAnswers).values(insertData);
 		});
 
-		res.status(201).json({ message: "Applications submitted successfully." });
+		res
+			.status(HttpStatusCodes.CREATED)
+			.json({ message: HttpStatusPhrases.CREATED });
 		return;
 	} catch (error) {
 		next(error);

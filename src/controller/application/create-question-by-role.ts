@@ -1,5 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import {
 	requirementCategories,
@@ -49,7 +51,9 @@ export const createQuestionByRole = async (
 		const role = req.query.role as string | undefined;
 
 		if (!role) {
-			res.status(400).json({ message: "role is required." });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 
@@ -62,8 +66,8 @@ export const createQuestionByRole = async (
 
 		if (existingRole.length > 0) {
 			res
-				.status(400)
-				.json({ message: "Questions for this role already exist." });
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 
@@ -73,7 +77,9 @@ export const createQuestionByRole = async (
 				.from(roles)
 				.where(eq(roles.id, role));
 			if (roleResult.length === 0) {
-				res.status(404).json({ message: "Role not found" });
+				res
+					.status(HttpStatusCodes.NOT_FOUND)
+					.json({ message: HttpStatusPhrases.NOT_FOUND });
 				return;
 			}
 
@@ -138,7 +144,9 @@ export const createQuestionByRole = async (
 			);
 		});
 
-		res.status(201).json({ message: "Question created successfully." });
+		res
+			.status(HttpStatusCodes.CREATED)
+			.json({ message: HttpStatusPhrases.CREATED });
 		return;
 	} catch (error) {
 		next(error);

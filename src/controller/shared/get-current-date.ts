@@ -1,5 +1,7 @@
 import { sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 
 export const getCurrentDate = async (
@@ -16,8 +18,8 @@ export const getCurrentDate = async (
 		const currentDate = dateNowResult.rows[0].current_timestamp;
 		const timeZone = Object.values(timeZoneResult.rows[0])[0];
 
-		res.status(200).json({
-			message: "Current date fetched successfully",
+		res.status(HttpStatusCodes.OK).json({
+			message: HttpStatusPhrases.OK,
 			data: { currentDate, timeZone },
 		});
 		return;

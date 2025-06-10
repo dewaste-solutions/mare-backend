@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import {
 	permissions,
@@ -44,7 +46,9 @@ export async function signInUser(
 		if (existingUser.length === 0) {
 			const fakePassword = crypto.randomBytes(32).toString("hex");
 			await bcrypt.hash(fakePassword, 10);
-			res.status(401).json({ message: "Invalid input" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -55,7 +59,9 @@ export async function signInUser(
 		);
 		// if not password is not correct then return invalid input
 		if (!passwordResult) {
-			res.status(401).json({ message: "Invalid input" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -72,7 +78,9 @@ export async function signInUser(
 
 		// if the permission list is empty then return internal server error
 		if (permissionList.length === 0) {
-			res.status(500).json({ message: "Internal server error" });
+			res
+				.status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
+				.json({ message: HttpStatusPhrases.INTERNAL_SERVER_ERROR });
 			return;
 		}
 		const permissionsArray = permissionList.map((p) => p.scope);
@@ -99,7 +107,9 @@ export async function signInUser(
 					.returning({ id: sessions.id });
 
 				if (newSession.length === 0) {
-					res.status(500).json({ message: "Internal server error" });
+					res
+						.status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
+						.json({ message: HttpStatusPhrases.INTERNAL_SERVER_ERROR });
 					return;
 				}
 
@@ -146,8 +156,8 @@ export async function signInUser(
 		});
 		// return the access token in the response
 		res
-			.status(200)
-			.json({ message: "User signin successfully", data: accessToken });
+			.status(HttpStatusCodes.OK)
+			.json({ message: HttpStatusPhrases.OK, data: accessToken });
 		return;
 	} catch (error) {
 		next(error);

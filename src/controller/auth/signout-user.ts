@@ -1,5 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { refreshTokens, sessions } from "../../db/schema/auth";
 import { decryptToken } from "../../helper/auth/validate-token";
@@ -14,7 +16,9 @@ export const signoutUser = async (
 
 		// Check if token is present
 		if (!token) {
-			res.status(401).json({ message: "Unauthorized" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -22,7 +26,9 @@ export const signoutUser = async (
 		const decodeToken = await decryptToken(token);
 		// Check if token is valid
 		if (!decodeToken) {
-			res.status(401).json({ message: "Invalid token" });
+			res
+				.status(HttpStatusCodes.UNAUTHORIZED)
+				.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 			return;
 		}
 
@@ -38,7 +44,9 @@ export const signoutUser = async (
 
 		// Check if token is present
 		if (tokenRecord.length === 0) {
-			res.status(404).json({ message: "Token not found" });
+			res
+				.status(HttpStatusCodes.NOT_FOUND)
+				.json({ message: HttpStatusPhrases.NOT_FOUND });
 			return;
 		}
 
@@ -48,12 +56,14 @@ export const signoutUser = async (
 			.where(eq(refreshTokens.id, tokenRecord[0].tokenId));
 
 		if (result.rowCount === 0) {
-			res.status(400).json({ message: "Token found, but failed to revoke" });
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
 			return;
 		}
 
 		res.clearCookie("refreshToken");
-		res.status(200).json({ message: "Signed out successfully" });
+		res.status(HttpStatusCodes.OK).json({ message: HttpStatusPhrases.OK });
 		return;
 	} catch (error) {
 		next(error);

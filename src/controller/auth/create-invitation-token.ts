@@ -1,6 +1,8 @@
 import crypto from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../constant/http-status-codes";
+import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
 import { invitedUsers } from "../../db/schema/application";
 import { oneTimeTokens, roles } from "../../db/schema/auth";
@@ -65,7 +67,9 @@ export async function createInvitationToken(
 			});
 		});
 
-		res.status(201).json({ message: "One-time token created." });
+		res
+			.status(HttpStatusCodes.CREATED)
+			.json({ message: HttpStatusPhrases.CREATED });
 	} catch (error) {
 		next(error);
 	}
