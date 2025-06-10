@@ -1,5 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
+import * as HttpStatusCodes from "../../src/constant/http-status-codes";
+import * as HttpStatusPhrases from "../../src/constant/http-status-phrases";
 import { db } from "../db";
 import { refreshTokens, sessions } from "../db/schema/auth";
 import {
@@ -32,7 +34,9 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 			const authHeader = req.headers.authorization;
 			const accessToken = authHeader?.split(" ")[1];
 			if (!accessToken) {
-				res.status(401).json({ message: "Unauthorized: Missing access token" });
+				res
+					.status(HttpStatusCodes.UNAUTHORIZED)
+					.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 				return;
 			}
 
@@ -40,7 +44,9 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 				await isAccessTokenValidated({ accessToken, returnDecoded: true });
 
 			if (!isAccessTokenValid || !decodedAccessToken) {
-				res.status(401).json({ message: "Unauthorized: Invalid access token" });
+				res
+					.status(HttpStatusCodes.UNAUTHORIZED)
+					.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 				return;
 			}
 
@@ -53,8 +59,8 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 
 			if (!refreshTokenCookies || !isRefreshTokenValid) {
 				res
-					.status(401)
-					.json({ message: "Unauthorized: Missing refresh token" });
+					.status(HttpStatusCodes.UNAUTHORIZED)
+					.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 				return;
 			}
 
@@ -69,7 +75,9 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 				.limit(1);
 
 			if (sessionRecord.length === 0 || sessionRecord[0].revoked) {
-				res.status(401).json({ message: "Unauthorized: Invalid session" });
+				res
+					.status(HttpStatusCodes.UNAUTHORIZED)
+					.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 				return;
 			}
 
@@ -78,7 +86,9 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 				decodedAccessToken === null ||
 				!decodedAccessToken.permission
 			) {
-				res.status(401).json({ message: "Unauthorized: Invalid token format" });
+				res
+					.status(HttpStatusCodes.UNAUTHORIZED)
+					.json({ message: HttpStatusPhrases.UNAUTHORIZED });
 				return;
 			}
 
@@ -89,8 +99,8 @@ export const checkPermissions = (requiredPermissions: string[]) => {
 
 			if (!hasPermission) {
 				res
-					.status(403)
-					.json({ message: "Forbidden: Insufficient permissions" });
+					.status(HttpStatusCodes.FORBIDDEN)
+					.json({ message: HttpStatusPhrases.FORBIDDEN });
 				return;
 			}
 
