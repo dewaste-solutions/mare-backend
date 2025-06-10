@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 
 import { env } from "./env";
+import { configureOpenApi } from "./lib/configure-open-api";
 import { httpLogger } from "./middleware/http-logger";
 import { notFoundLogger } from "./middleware/not-found-logger";
 import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
@@ -23,6 +24,9 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(httpLogger());
+
+// docs
+configureOpenApi(app);
 
 // PUT your api here and set a rate limit
 app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
