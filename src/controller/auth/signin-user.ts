@@ -76,13 +76,6 @@ export async function signInUser(
 			)
 			.where(eq(rolePermissionConnection.roleId, existingUser[0].roleId));
 
-		// if the permission list is empty then return internal server error
-		if (permissionList.length === 0) {
-			res
-				.status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
-				.json({ message: HttpStatusPhrases.INTERNAL_SERVER_ERROR });
-			return;
-		}
 		const permissionsArray = permissionList.map((p) => p.scope);
 
 		const privateKey = env.BACKEND_AUTH_PRIVATE_KEY;

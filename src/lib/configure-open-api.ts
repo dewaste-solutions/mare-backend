@@ -1,7 +1,6 @@
 import { apiReference } from "@scalar/express-api-reference";
 import type { Express } from "express";
 import swaggerJsdoc from "swagger-jsdoc";
-import { env } from "../env";
 
 export function configureOpenApi(app: Express) {
 	const options = {
@@ -14,7 +13,8 @@ export function configureOpenApi(app: Express) {
 			},
 			servers: [
 				{
-					url: `http://BACKEND_URL:${env.BACKEND_PORT}`,
+					// biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
+					url: `/`,
 					description: "Development server",
 				},
 			],
