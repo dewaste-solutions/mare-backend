@@ -37,7 +37,6 @@ export const getProfile = async (
 				email: users.email,
 				firstName: users.firstName,
 				lastName: users.lastName,
-				roleId: users.roleId,
 				roleName: roles.name,
 			})
 			.from(users)
