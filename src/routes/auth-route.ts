@@ -185,6 +185,8 @@ authRoutes.post("/signout", signoutUser);
  *                       type: string
  *                     roleName:
  *                       type: string
+ *                     image:
+ *                       type: string
  *       401:
  *         description: Not authenticated
  *       403:

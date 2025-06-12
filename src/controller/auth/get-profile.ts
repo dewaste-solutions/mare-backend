@@ -3,7 +3,13 @@ import type { NextFunction, Request, Response } from "express";
 import * as HttpStatusCodes from "../../constant/http-status-codes";
 import * as HttpStatusPhrases from "../../constant/http-status-phrases";
 import { db } from "../../db";
-import { refreshTokens, roles, sessions, users } from "../../db/schema/auth";
+import {
+	profiles,
+	refreshTokens,
+	roles,
+	sessions,
+	users,
+} from "../../db/schema/auth";
 
 export const getProfile = async (
 	req: Request,
@@ -38,9 +44,11 @@ export const getProfile = async (
 				firstName: users.firstName,
 				lastName: users.lastName,
 				roleName: roles.name,
+				image: profiles.image,
 			})
 			.from(users)
 			.leftJoin(roles, eq(users.roleId, roles.id))
+			.leftJoin(profiles, eq(users.id, profiles.userId))
 			.where(eq(users.id, userId))
 			.limit(1);
 
@@ -51,9 +59,14 @@ export const getProfile = async (
 			return;
 		}
 
+		const profileData = {
+			...userProfile[0],
+			image: userProfile[0].image === null ? "" : userProfile[0].image,
+		};
+
 		res
 			.status(HttpStatusCodes.OK)
-			.json({ message: HttpStatusPhrases.OK, data: userProfile[0] });
+			.json({ message: HttpStatusPhrases.OK, data: profileData });
 		return;
 	} catch (error) {
 		next(error);
