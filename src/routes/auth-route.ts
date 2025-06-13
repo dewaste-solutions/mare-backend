@@ -139,12 +139,6 @@ authRoutes.post("/signin", validateAuthSignIn, signInUser);
  *     responses:
  *       200:
  *         description: Successfully signed out
- *       400:
- *         description: Bad request, invalid input
- *       404:
- *         description: No valid session found
- *       401:
- *         description: No valid session found
  */
 authRoutes.post("/signout", signoutUser);
 
