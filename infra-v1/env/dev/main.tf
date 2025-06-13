@@ -136,7 +136,7 @@ resource "digitalocean_app" "mare-backend" {
       instance_count = 1
       instance_size_slug = "basic-xxs"
 
-      run_command = "npm run db:migrate && npm run db:push"
+      run_command = "npm run db:migrate"
     }
 
     service {
