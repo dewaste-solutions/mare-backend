@@ -12,6 +12,12 @@ import {
 
 export const authSchema = pgSchema("auth");
 
+export const userStatusEnum = pgEnum("user_status_enum", [
+	"active",
+	"suspended",
+	"deactivated",
+]);
+
 export const users = authSchema.table("users", {
 	id: uuid("id").notNull().primaryKey().default(sql`gen_random_uuid()`),
 	firstName: text("first_name").notNull(),
@@ -21,6 +27,7 @@ export const users = authSchema.table("users", {
 	// Token for password reset (forgot password).
 	recoveryToken: text("recovery_token"),
 	recoverySentAt: timestamp("recovery_sent_at"),
+	status: userStatusEnum("status").default("active").notNull(),
 
 	roleId: uuid("role_id")
 		.notNull()

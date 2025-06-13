@@ -27,6 +27,18 @@ export const submitApplication = async (
 			return;
 		}
 
+		const existingApplication = await db
+			.select({ id: onBoarding.id })
+			.from(onBoarding)
+			.where(eq(onBoarding.invitedUsersId, userInvitedId))
+			.limit(1);
+		if (existingApplication.length > 0) {
+			res
+				.status(HttpStatusCodes.BAD_REQUEST)
+				.json({ message: HttpStatusPhrases.BAD_REQUEST });
+			return;
+		}
+
 		await db.transaction(async (tx) => {
 			const statusResult = await tx
 				.select({ id: statuses.id })
