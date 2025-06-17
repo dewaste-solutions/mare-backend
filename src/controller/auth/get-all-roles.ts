@@ -10,9 +10,7 @@ export const getAllRoles = async (
 	next: NextFunction,
 ): Promise<void> => {
 	try {
-		const allRoles = await db
-			.select({ id: roles.id, name: roles.name })
-			.from(roles);
+		const allRoles = await db.select({ name: roles.name }).from(roles);
 
 		res
 			.status(HttpStatusCodes.OK)

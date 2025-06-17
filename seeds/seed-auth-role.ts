@@ -39,11 +39,6 @@ export async function seedAuthRole() {
 				updatedAt: sql`NOW()`,
 			},
 			{
-				description: "Can read roles",
-				scope: "read:roles",
-				updatedAt: sql`NOW()`,
-			},
-			{
 				description: "Can create application questions",
 				scope: "create:application-question",
 				updatedAt: sql`NOW()`,
@@ -71,7 +66,6 @@ export async function seedAuthRole() {
 		if (roleMap.admin) {
 			const adminOnlyPermissions = [
 				"create:invitation",
-				"read:roles",
 				"create:application-question",
 			];
 

@@ -6,7 +6,6 @@ import { env } from "./env";
 import { configureOpenApi } from "./lib/configure-open-api";
 import { httpLogger } from "./middleware/http-logger";
 import { notFoundLogger } from "./middleware/not-found-logger";
-import { RateLimitCategory, applyRateLimit } from "./middleware/rate-limit";
 import { applicationRoutes } from "./routes/application-route";
 import { authRoutes } from "./routes/auth-route";
 import { sharedRoute } from "./routes/shared-route";
@@ -28,14 +27,10 @@ app.use(httpLogger());
 // docs
 configureOpenApi(app);
 
-// PUT your api here and set a rate limit
-app.use("/api/auth", applyRateLimit(RateLimitCategory.STRICT), authRoutes);
-app.use("/api/shared", applyRateLimit(RateLimitCategory.LENIENT), sharedRoute);
-app.use(
-	"/api/application",
-	applyRateLimit(RateLimitCategory.LENIENT),
-	applicationRoutes,
-);
+// PUT your api here
+app.use("/api/auth", authRoutes);
+app.use("/api/shared", sharedRoute);
+app.use("/api/application", applicationRoutes);
 
 app.use(notFoundLogger());
 

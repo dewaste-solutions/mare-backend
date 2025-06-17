@@ -1,2 +1,0 @@
-CREATE TYPE "public"."user_status_enum" AS ENUM('active', 'suspended', 'deactivated');--> statement-breakpoint
-ALTER TABLE "auth"."users" ADD COLUMN "status" "user_status_enum" DEFAULT 'active' NOT NULL;

@@ -11,6 +11,7 @@ export default defineConfig({
 		"./src/db/schema/auth.ts",
 		"./src/db/schema/shared.ts",
 		"./src/db/schema/application.ts",
+		"./src/db/schema/workers.ts",
 	],
 	dialect: "postgresql",
 	dbCredentials: {

@@ -2,11 +2,11 @@ import express from "express";
 import { createQuestionByRole } from "../controller/application/create-question-by-role";
 import { getQuestionByRole } from "../controller/application/get-question-by-application";
 import { submitApplication } from "../controller/application/submit-application";
-import {
-	validateApplicationSubmit,
-	validateCreateQuestionByRole,
-} from "../middleware/application/validate-body";
+import { validateCreateQuestionByRole } from "../middleware/application/create-question-by-role-validate";
+import { validateApplicationSubmit } from "../middleware/application/submit-application-validate";
+import { checkUserStatus } from "../middleware/check-user-status";
 import { checkPermissions } from "../middleware/rabc";
+import { RateLimitCategory, applyRateLimit } from "../middleware/rate-limit";
 
 export const applicationRoutes = express.Router();
 
@@ -85,7 +85,11 @@ export const applicationRoutes = express.Router();
  *       400:
  *         description: Bad request - Missing or invalid parameters
  */
-applicationRoutes.get("/get-application-question", getQuestionByRole);
+applicationRoutes.get(
+	"/get-application-question",
+	applyRateLimit(RateLimitCategory.LENIENT),
+	getQuestionByRole,
+);
 
 /**
  * @openapi
@@ -146,6 +150,7 @@ applicationRoutes.get("/get-application-question", getQuestionByRole);
  */
 applicationRoutes.post(
 	"/submit-application",
+	applyRateLimit(RateLimitCategory.STRICT),
 	validateApplicationSubmit,
 	submitApplication,
 );
@@ -246,7 +251,9 @@ applicationRoutes.post(
  */
 applicationRoutes.post(
 	"/create-question-by-role",
+	applyRateLimit(RateLimitCategory.STRICT),
 	checkPermissions(["create:application-question"]),
+	checkUserStatus("verified"),
 	validateCreateQuestionByRole,
 	createQuestionByRole,
 );

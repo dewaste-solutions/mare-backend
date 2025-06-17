@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import { sql } from "drizzle-orm";
 import { db } from "../src/db";
-import { roles, users } from "../src/db/schema/auth";
+import { profiles, roles, users } from "../src/db/schema/auth";
+import { wasteCollectors } from "../src/db/schema/workers";
 
 export async function seedAuthAccount() {
 	await db.transaction(async (tx) => {
@@ -96,16 +97,47 @@ export async function seedAuthAccount() {
 			userEntries.map((user) => bcrypt.hash(user.role, 10)),
 		);
 
-		const userData = userEntries.map((user, index) => ({
-			firstName: user.firstName,
-			lastName: user.lastName,
-			email: user.email,
-			encryptedPassword: passwords[index],
-			roleId: roleMap[user.role],
-			updatedAt: sql`NOW()`,
-		}));
+		for (let i = 0; i < userEntries.length; i++) {
+			const user = userEntries[i];
 
-		await tx.insert(users).values(userData).onConflictDoNothing();
+			// Create user
+			const newUser = await tx
+				.insert(users)
+				.values({
+					firstName: user.firstName,
+					lastName: user.lastName,
+					email: user.email,
+					encryptedPassword: passwords[i],
+					roleId: roleMap[user.role],
+					updatedAt: sql`NOW()`,
+				})
+				.returning({
+					id: users.id,
+				})
+				.onConflictDoNothing();
+
+			if (newUser && newUser.length > 0) {
+				// Create profile for each user
+				await tx
+					.insert(profiles)
+					.values({
+						userId: newUser[0].id,
+						updatedAt: sql`NOW()`,
+					})
+					.onConflictDoNothing();
+
+				// Create waste collector record for workers
+				if (user.role === "worker") {
+					await tx
+						.insert(wasteCollectors)
+						.values({
+							userId: newUser[0].id,
+							updatedAt: sql`NOW()`,
+						})
+						.onConflictDoNothing();
+				}
+			}
+		}
 	});
 
 	const result = await db.select({ email: users.email }).from(users);

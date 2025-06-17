@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { NextFunction, Request, Response } from "express";
-import * as HttpStatusCodes from "../../src/constant/http-status-codes";
-import * as HttpStatusPhrases from "../../src/constant/http-status-phrases";
+import * as HttpStatusCodes from "../constant/http-status-codes";
+import * as HttpStatusPhrases from "../constant/http-status-phrases";
 import { db } from "../db";
 import { refreshTokens, sessions } from "../db/schema/auth";
 import {

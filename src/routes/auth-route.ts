@@ -7,12 +7,12 @@ import { getProfile } from "../controller/auth/get-profile";
 import { signInUser } from "../controller/auth/signin-user";
 import { signoutUser } from "../controller/auth/signout-user";
 import { verifyInvitationToken } from "../controller/auth/verify-invitation-token";
-import {
-	validateAuthInvitation,
-	validateAuthSignIn,
-	validateAuthSignup,
-} from "../middleware/auth/validate-body";
+import { validateAuthInvitation } from "../middleware/auth/create-invitation-token-validate";
+import { validateAuthSignup } from "../middleware/auth/create-user-validate";
+import { validateAuthSignIn } from "../middleware/auth/signin-user-validate";
+import { checkUserStatus } from "../middleware/check-user-status";
 import { checkPermissions } from "../middleware/rabc";
+import { RateLimitCategory, applyRateLimit } from "../middleware/rate-limit";
 
 export const authRoutes = express.Router();
 
@@ -67,7 +67,12 @@ export const authRoutes = express.Router();
  *       500:
  *         description: Server error
  */
-authRoutes.post("/signup", validateAuthSignup, createUser);
+authRoutes.post(
+	"/signup",
+	applyRateLimit(RateLimitCategory.STRICT),
+	validateAuthSignup,
+	createUser,
+);
 
 /**
  * @openapi
@@ -120,7 +125,12 @@ authRoutes.post("/signup", validateAuthSignup, createUser);
  *       500:
  *         description: Server error
  */
-authRoutes.post("/signin", validateAuthSignIn, signInUser);
+authRoutes.post(
+	"/signin",
+	applyRateLimit(RateLimitCategory.STRICT),
+	validateAuthSignIn,
+	signInUser,
+);
 
 /**
  * @openapi
@@ -140,7 +150,11 @@ authRoutes.post("/signin", validateAuthSignIn, signInUser);
  *       200:
  *         description: Successfully signed out
  */
-authRoutes.post("/signout", signoutUser);
+authRoutes.post(
+	"/signout",
+	applyRateLimit(RateLimitCategory.STRICT),
+	signoutUser,
+);
 
 /**
  * @openapi
@@ -188,7 +202,13 @@ authRoutes.post("/signout", signoutUser);
  *       404:
  *         description: User profile not found
  */
-authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
+authRoutes.get(
+	"/profile",
+	applyRateLimit(RateLimitCategory.MODERATE),
+	checkPermissions(["read:profile"]),
+	checkUserStatus("verified"),
+	getProfile,
+);
 
 // getAccessToken also have checkPermissions generate:access-token
 /**
@@ -223,7 +243,11 @@ authRoutes.get("/profile", checkPermissions(["read:profile"]), getProfile);
  *       403:
  *         description: Insufficient permissions
  */
-authRoutes.post("/renew-access-token", getAccessToken);
+authRoutes.post(
+	"/renew-access-token",
+	applyRateLimit(RateLimitCategory.MODERATE),
+	getAccessToken,
+);
 
 /**
  * @openapi
@@ -271,7 +295,9 @@ authRoutes.post("/renew-access-token", getAccessToken);
  */
 authRoutes.post(
 	"/generate-invitation",
+	applyRateLimit(RateLimitCategory.STRICT),
 	checkPermissions(["create:invitation"]),
+	checkUserStatus("verified"),
 	validateAuthInvitation,
 	createInvitationToken,
 );
@@ -314,7 +340,11 @@ authRoutes.post(
  *       401:
  *         description: Invalid or expired token
  */
-authRoutes.post("/verify-invitation", verifyInvitationToken);
+authRoutes.post(
+	"/verify-invitation",
+	applyRateLimit(RateLimitCategory.MODERATE),
+	verifyInvitationToken,
+);
 
 /**
  * @openapi
@@ -324,8 +354,6 @@ authRoutes.post("/verify-invitation", verifyInvitationToken);
  *     description: |
  *       Returns a list of all roles in the system
  *
- *       Required Permission:
- *       - read:roles
  *     tags:
  *       - Authentication
  *     security:
@@ -345,14 +373,11 @@ authRoutes.post("/verify-invitation", verifyInvitationToken);
  *                   items:
  *                     type: object
  *                     properties:
- *                       id:
- *                         type: string
- *                         format: uuid
  *                       name:
  *                         type: string
- *       401:
- *         description: Unauthorized, missing or invalid access token
- *       403:
- *         description: Insufficient permissions
  */
-authRoutes.get("/get-all-roles", checkPermissions(["read:roles"]), getAllRoles);
+authRoutes.get(
+	"/get-all-roles",
+	applyRateLimit(RateLimitCategory.LENIENT),
+	getAllRoles,
+);

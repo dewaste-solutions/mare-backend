@@ -1,6 +1,7 @@
 import express from "express";
 
 import { getCurrentDate } from "../controller/shared/get-current-date";
+import { RateLimitCategory, applyRateLimit } from "../middleware/rate-limit";
 
 export const sharedRoute = express.Router();
 
@@ -46,4 +47,8 @@ export const sharedRoute = express.Router();
  *                 currentDate: "2025-06-10T15:30:00.000Z"
  *                 timeZone: "UTC"
  */
-sharedRoute.get("/get-current-date", getCurrentDate);
+sharedRoute.get(
+	"/get-current-date",
+	applyRateLimit(RateLimitCategory.LENIENT),
+	getCurrentDate,
+);

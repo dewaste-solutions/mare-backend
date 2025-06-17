@@ -13,9 +13,10 @@ import {
 export const authSchema = pgSchema("auth");
 
 export const userStatusEnum = pgEnum("user_status_enum", [
-	"active",
-	"suspended",
-	"deactivated",
+	"pending_approval", // Default status when user registers - awaiting admin verification
+	"verified", // User has been approved by admin and can fully access the system
+	"suspended", // Temporary block - user access is temporarily restricted
+	"deactivated", // Account disabled - user can no longer access the system
 ]);
 
 export const users = authSchema.table("users", {
@@ -27,7 +28,7 @@ export const users = authSchema.table("users", {
 	// Token for password reset (forgot password).
 	recoveryToken: text("recovery_token"),
 	recoverySentAt: timestamp("recovery_sent_at"),
-	status: userStatusEnum("status").default("active").notNull(),
+	status: userStatusEnum("status").default("pending_approval").notNull(),
 
 	roleId: uuid("role_id")
 		.notNull()
